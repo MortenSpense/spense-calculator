@@ -40,19 +40,43 @@ Results include annual savings, 5-year net savings, payback period, 5-year ROI, 
  
 ## Save assumptions (sending to a prospect)
  
-The **Save assumptions** button downloads a personalised copy of the calculator as an HTML file with your current inputs baked in as defaults.
+The **Save assumptions** button downloads a personalised copy of the calculator as an HTML file with your current inputs baked in as defaults. The active view (Aftersales, Car Sales, or Combined) is also saved — so the prospect lands on the right tab when they open it.
  
 **Workflow:**
 1. Configure all inputs to match the prospect's situation
-2. Click **Save assumptions**
-3. A file called `spense-roi-calculator.html` downloads to your computer
-4. Attach it to an email with a message along the lines of:
+2. Switch to the view you want the prospect to land on
+3. Click **Save assumptions**
+4. A file called `spense-roi-calculator.html` downloads to your computer
+5. Attach it to an email, or follow the steps below to give the prospect their own hosted URL
+ 
+**Email message suggestion:**
  
 > *"I've prepared a business case with numbers I believe match your situation. If I'm off on any of them, feel free to adjust the inputs — the calculator will update in real time."*
  
-The prospect opens the file in their browser and sees your numbers pre-loaded. They can adjust any slider or input freely. No installation required on their end.
+The prospect opens the file in their browser and sees your numbers pre-loaded on the right view. They can adjust any slider or input freely. No installation required on their end.
  
 > **Note:** Some corporate email systems block `.html` attachments. If delivery fails, zip the file first — `spense-roi-calculator.zip` is less likely to be flagged.
+ 
+---
+ 
+## Creating a per-prospect hosted URL
+ 
+Instead of sending an attachment, you can give each prospect their own permanent URL. This is more professional and avoids email attachment issues.
+ 
+**Workflow:**
+1. Configure the calculator for the prospect and click **Save assumptions**
+2. Rename the downloaded file to the prospect's name, e.g. `Hessel.html`
+3. Go to [github.com/MortenSpense/spense-calculator](https://github.com/MortenSpense/spense-calculator)
+4. Click **Add file → Upload files**, upload the renamed file, click **Commit changes**
+5. The prospect's URL is immediately live at:
+ 
+```
+https://mortenspense.github.io/spense-calculator/Hessel.html
+```
+ 
+The prospect opens it and lands directly on the correct view with your numbers pre-loaded.
+ 
+> **Housekeeping:** Delete prospect files for closed or dead deals periodically to keep the repo tidy.
  
 ---
  
@@ -83,14 +107,13 @@ Car sales pricing for non-Denmark markets is placeholder — update when confirm
  
 ---
  
-## Updating the calculator
+## Updating the master calculator
  
 When a new version of the HTML file is ready:
  
-1. Go to [github.com/MortenSpense/spense-calculator](https://github.com/MortenSpense/spense-calculator)
-2. Click **Add file → Upload files**
-3. Upload the new HTML file
-4. Click **Commit changes**
+1. Rename the new file to `index.html`
+2. Go to [github.com/MortenSpense/spense-calculator](https://github.com/MortenSpense/spense-calculator)
+3. Click **Add file → Upload files**, upload `index.html`, click **Commit changes**
  
 The live URL updates automatically within ~1 minute. No further action needed.
  
@@ -100,8 +123,8 @@ The live URL updates automatically within ~1 minute. No further action needed.
  
 | Version | Changes |
 |---------|---------|
-| v2.5 | Save assumptions uses fetch when hosted; locations slider extended to 50 |
-| v2.4 | Save assumptions button — downloads personalised copy with current values as defaults |
+| v2.5 | Active view saved with assumptions — prospect lands on correct tab automatically; locations slider extended to 50 |
+| v2.4 | Save assumptions button — downloads personalised copy with current values as defaults; uses fetch when hosted, falls back to captured HTML for local use |
 | v2.3 | POS terminals per location slider added |
 | v2.2 | FTE hours badge bug fixed; combined FTE card added to combined view |
 | v2.1 | Avg car value slider min lowered to cover kr175,000 DKK |
