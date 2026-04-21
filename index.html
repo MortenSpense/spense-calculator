@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spense — ROI & TCO Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f7f7;--surface:#fff;--surface2:#f2f2f2;
+  --border:#e0e0e0;--border2:#d2d2d2;
+  --text:#1a1a1a;--text2:#555;--text3:#999;
+  --blue:#3d60f5;--blue-dark:#2a47d4;--blue-bg:#eef1fe;--blue-text:#2a47d4;
+  --red:#c0392b;--amber:#a06000;--amber-bg:#fef8ec;--amber-border:rgba(160,96,0,0.2);
+  --green:#1a7a52;--green-bg:#e8f5ee;--green-text:#0f5c3a;
+  --sep:#d2d2d2;--radius:8px;--radius-lg:10px;
+  --font:'Montserrat',sans-serif;--body:'Open Sans',sans-serif;
+}
+body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;height:54px;display:flex;align-items:center;padding:0 1.5rem}
+.header-inner{width:100%;max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:-0.01em;flex-shrink:0}
+.logo-icon{width:22px;height:22px;flex-shrink:0}
+.logo-sep{font-size:11px;font-family:var(--body);font-weight:400;color:var(--text3);border-left:1px solid var(--border2);padding-left:10px;margin-left:2px}
+.header-right{display:flex;align-items:center;gap:10px}
+.header-stats{display:flex;align-items:center;gap:12px;font-size:12px;font-family:var(--body)}
+.header-stat{display:flex;align-items:center;gap:5px}
+.header-stat-label{color:var(--text3)}
+.header-stat-value{font-weight:600;font-family:var(--font)}
+.hs-sep{width:1px;height:16px;background:var(--sep)}
+.view-tabs{display:flex;gap:3px;background:var(--surface2);border-radius:var(--radius);padding:3px;border:1px solid var(--border)}
+.view-tab{padding:5px 12px;font-size:11px;font-family:var(--font);font-weight:600;border:none;border-radius:6px;cursor:pointer;background:transparent;color:var(--text3);transition:all .15s;white-space:nowrap}
+.view-tab:hover{color:var(--blue)}
+.view-tab.active{background:var(--blue);color:#fff}
+.export-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:12px;font-family:var(--font);font-weight:600;cursor:pointer;transition:background .15s;flex-shrink:0}
+.export-btn:hover{background:var(--blue-dark)}
+.save-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--surface);color:var(--text);border:1px solid var(--border2);border-radius:var(--radius);font-size:12px;font-family:var(--font);font-weight:600;cursor:pointer;transition:all .15s;flex-shrink:0}
+.save-btn:hover{border-color:var(--blue);color:var(--blue)}
+.main{max-width:1300px;margin:0 auto;padding:1.5rem;display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;align-items:start}
+.left{position:sticky;top:62px;max-height:calc(100vh - 80px);overflow-y:auto;scrollbar-width:thin}
+.left::-webkit-scrollbar{width:3px}
+.left::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+footer{max-width:1300px;margin:2rem auto 0;padding:1rem 1.5rem;border-top:1px solid var(--border)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.1rem;margin-bottom:10px}
+.card:last-child{margin-bottom:0}
+.sec{font-size:9.5px;font-family:var(--font);font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--text3);margin:14px 0 8px}
+.sec:first-child{margin-top:0}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.row:last-child{margin-bottom:0}
+.row label{font-size:12px;color:var(--text2);flex:1;min-width:0;line-height:1.3;font-family:var(--body)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:80px;flex-shrink:0;height:3px;border-radius:2px;background:var(--surface2);outline:none;cursor:pointer;border:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--blue);border:2.5px solid #fff;box-shadow:0 0 0 1px var(--blue);cursor:pointer;transition:transform .1s}
+input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.15)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--blue);border:2.5px solid #fff;cursor:pointer}
+.val{font-size:11.5px;font-family:var(--body);font-weight:600;min-width:58px;text-align:right;color:var(--text);white-space:nowrap}
+.presets{display:flex;gap:5px;margin-bottom:12px}
+.preset-btn{flex:1;padding:6px 4px;font-size:10.5px;font-family:var(--body);font-weight:500;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface2);color:var(--text2);cursor:pointer;text-align:center;transition:all .15s;line-height:1.3}
+.preset-btn:hover{border-color:var(--blue);color:var(--blue-text)}
+.preset-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+.preset-btn small{display:block;font-size:9px;opacity:.65;margin-top:2px}
+.markets{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:0}
+.market-btn{padding:6px 4px;font-size:10px;font-family:var(--body);font-weight:500;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface2);color:var(--text2);cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1}
+.market-btn:hover{border-color:var(--blue);color:var(--blue-text)}
+.market-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.market-btn.active .flag{background:rgba(255,255,255,0.25);color:#fff}
+.market-btn .flag{font-size:8px;font-family:var(--font);font-weight:700;letter-spacing:.04em;background:rgba(61,96,245,0.1);color:var(--blue);border-radius:3px;padding:2px 4px}
+select{width:100%;font-size:12px;font-family:var(--body);border:1px solid var(--border2);border-radius:var(--radius);padding:7px 10px;background:var(--surface);color:var(--text);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;margin-bottom:10px}
+select:focus{border-color:var(--blue)}
+.toggle-row{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);cursor:pointer;margin-bottom:7px}
+.toggle-row:last-child{margin-bottom:0}
+.toggle-row.amber-toggle{background:var(--amber-bg);border-color:var(--amber-border)}
+.toggle-track{width:30px;height:17px;border-radius:9px;background:#ccc;position:relative;flex-shrink:0;cursor:pointer;transition:background .2s;margin-top:1px}
+.toggle-track.on{background:var(--blue)}
+.toggle-track.amber.on{background:#d97706}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:left .18s}
+.toggle-track.on .toggle-thumb{left:15px}
+.toggle-label{font-size:12px;font-weight:600;color:var(--text2);line-height:1.3;font-family:var(--body)}
+.toggle-row.amber-toggle .toggle-label{color:var(--amber)}
+.toggle-desc{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.4;font-family:var(--body)}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.kpi-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.kpi-grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px}
+.kpi-label{font-size:9.5px;font-family:var(--font);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:5px}
+.kpi-value{font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1;font-family:var(--font)}
+.kpi-value.large{font-size:32px}
+.kpi-value.blue{color:var(--blue)}
+.kpi-value.dark{color:var(--text)}
+.kpi-value.green{color:var(--green-text)}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:4px;font-family:var(--body)}
+.kpi.accent-as{border-top:3px solid var(--blue)}
+.kpi.accent-cs{border-top:3px solid var(--green)}
+.kpi.accent-total{background:var(--blue);border-color:var(--blue)}
+.kpi.accent-total .kpi-label{color:rgba(255,255,255,0.7)}
+.kpi.accent-total .kpi-value{color:#fff}
+.kpi.accent-total .kpi-sub{color:rgba(255,255,255,0.65)}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-family:var(--body);font-weight:500}
+.badge.blue{background:var(--blue-bg);color:var(--blue-text)}
+.badge.green{background:var(--green-bg);color:var(--green-text)}
+.badge.amber{background:var(--amber-bg);color:var(--amber)}
+.breakdown-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--border);font-family:var(--body)}
+.breakdown-row:last-child{border-bottom:none;border-top:1.5px solid var(--sep);margin-top:4px;padding-top:8px;font-weight:700;font-size:13px}
+.breakdown-label{color:var(--text2)}
+.breakdown-value{font-weight:600;color:var(--text)}
+.breakdown-value.amber{color:var(--amber)}
+table{width:100%;font-size:12px;border-collapse:collapse;font-family:var(--body)}
+th{text-align:left;font-family:var(--font);font-weight:600;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:0 0 8px;border-bottom:2px solid var(--sep)}
+th:not(:first-child){text-align:right}
+td{padding:6px 0;border-bottom:1px solid var(--border)}
+td:not(:first-child){text-align:right}
+.td-label{color:var(--text2)}
+.td-savings{font-weight:700;color:var(--blue)}
+tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8px;font-weight:700}
+.chart-title{font-size:9.5px;font-family:var(--font);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:6px}
+.chart-legend{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap}
+.chart-legend span{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);font-family:var(--body)}
+.chart-legend i{width:10px;height:10px;border-radius:2px;flex-shrink:0;display:inline-block}
+.charts-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.num-input{width:62px;text-align:right;font-size:11.5px;font-family:var(--body);font-weight:600;border:1px solid var(--border2);border-radius:6px;padding:2px 6px;background:var(--surface);color:var(--text);outline:none;-moz-appearance:textfield}
+.num-input::-webkit-inner-spin-button,.num-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.num-input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(61,96,245,0.12)}
+.num-unit{font-size:11px;color:var(--text3);font-family:var(--body);width:20px}
+.row.editable input[type=range]{width:65px}
+.hidden{display:none!important}
+.view-section{display:none}
+.view-section.active{display:block}
+
+@media print{
+  @page{size:A4 landscape;margin:10mm 12mm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{background:#fff!important;font-size:10px;font-family:'Open Sans',sans-serif}
+  header,footer,.export-btn,.save-btn,.header-stats,.view-tabs,
+  .presets,.markets,select,
+  .toggle-row,#hidden-rows,#psp-rows,#overlap-rows,#risk-rows,
+  .badges,.charts-2col,.left{display:none!important}
+  .main{display:block!important;padding:0!important;max-width:100%!important}
+  #right{display:block;width:100%}
+  .view-section{display:block!important}
+  .print-masthead{display:flex!important;align-items:center;justify-content:space-between;margin-bottom:5mm;padding-bottom:3mm;border-bottom:2px solid #3d60f5}
+  .pm-left{display:flex;align-items:center;gap:8px}
+  .pm-logo-icon{width:20px;height:20px}
+  .pm-logo-text{font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:#1a1a1a}
+  .pm-sep{font-size:10px;color:#999;border-left:1px solid #d2d2d2;padding-left:8px;margin-left:4px;font-family:'Open Sans',sans-serif}
+  .pm-date{font-size:9px;color:#999;font-family:'Open Sans',sans-serif}
+  .print-params{display:flex!important;flex-wrap:nowrap;gap:0;background:#f7f7f7;border-radius:6px;border:1px solid #e0e0e0;padding:6px 10px;margin-bottom:5mm;overflow:hidden}
+  .print-param{flex:1;min-width:0;padding:0 8px;border-right:1px solid #e0e0e0}
+  .print-param:first-child{padding-left:0}
+  .print-param:last-child{border-right:none;padding-right:0}
+  .print-param-label{font-size:6.5px;text-transform:uppercase;letter-spacing:.07em;color:#999;font-family:'Montserrat',sans-serif;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .print-param-value{font-size:10px;font-weight:600;color:#1a1a1a;font-family:'Open Sans',sans-serif;white-space:nowrap}
+  .kpi-grid,.kpi-grid-4{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px!important;margin-bottom:5px!important}
+  .kpi-grid-3{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:5px!important;margin-bottom:5px!important}
+  .kpi{padding:8px 10px!important;border:1px solid #e0e0e0!important;border-radius:6px!important;break-inside:avoid;background:#fff!important}
+  .kpi:nth-child(1),.kpi:nth-child(2){border-top:3px solid #3d60f5!important}
+  .kpi-value.large{font-size:19px!important}
+  .kpi-value{font-size:17px!important}
+  .kpi-label{font-size:7px!important;margin-bottom:3px!important}
+  .kpi-sub{font-size:8px!important;margin-top:2px!important}
+  .print-lower{display:grid!important;grid-template-columns:200px 1fr 1fr!important;gap:6px!important;margin-top:5px!important;align-items:start}
+  .card{padding:7px 9px!important;border-radius:6px!important;break-inside:avoid;margin-bottom:0!important;border:1px solid #e0e0e0!important;background:#fff!important}
+  .sec{font-size:7px!important;margin:0 0 5px!important}
+  .breakdown-row{font-size:9.5px!important;padding:3px 0!important}
+  table{font-size:9px!important}
+  th{font-size:7px!important;padding:0 0 4px!important}
+  td{padding:3px 0!important}
+  .chart-title{font-size:7px!important;margin-bottom:3px!important}
+  .chart-legend{margin-bottom:4px!important}
+  .chart-legend span{font-size:8px!important}
+  #as-lineChart-wrap,#cs-lineChart-wrap,#comb-chart-wrap{height:120px!important}
+  .charts-2col{display:none!important}
+  .print-footer{display:flex!important;justify-content:space-between;align-items:center;margin-top:4mm;padding-top:3mm;border-top:1px solid #d2d2d2}
+  .print-disclaimer-text{font-size:7px;color:#999;font-family:'Open Sans',sans-serif;flex:1}
+  .print-footer-logo{display:flex;align-items:center;gap:5px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:#1a1a1a}
+  .print-footer-logo-icon{width:14px;height:14px}
+  .kpi.accent-total{background:#3d60f5!important;border-color:#3d60f5!important}
+  .kpi.accent-total .kpi-value,.kpi.accent-total .kpi-label,.kpi.accent-total .kpi-sub{color:#fff!important}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 32 32" fill="none"><rect x="2" y="14" width="10" height="10" rx="2" fill="#3d60f5"/><rect x="14" y="2" width="10" height="10" rx="2" fill="#3d60f5" opacity=".6"/><rect x="14" y="14" width="10" height="10" rx="2" fill="#3d60f5"/><rect x="2" y="2" width="10" height="10" rx="2" fill="#3d60f5" opacity=".3"/></svg>
+      spense
+      <span class="logo-sep">ROI &amp; TCO Calculator</span>
+    </div>
+    <div class="header-right">
+      <div class="header-stats">
+        <div class="header-stat"><span class="header-stat-label">Annual savings</span><span class="header-stat-value" id="h-savings" style="color:var(--blue)">—</span></div>
+        <div class="hs-sep"></div>
+        <div class="header-stat"><span class="header-stat-label">Payback</span><span class="header-stat-value" id="h-payback">—</span></div>
+        <div class="hs-sep"></div>
+        <div class="header-stat"><span class="header-stat-label">5yr ROI</span><span class="header-stat-value" id="h-roi" style="color:var(--blue)">—</span></div>
+      </div>
+      <div class="view-tabs">
+        <button class="view-tab active" onclick="switchView('as',this)">Aftersales</button>
+        <button class="view-tab" onclick="switchView('cs',this)">Car Sales</button>
+        <button class="view-tab" onclick="switchView('combined',this)">Combined</button>
+      </div>
+      <button class="export-btn" onclick="window.print()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 6V2h8v4M4 12H2V8h12v4h-2M4 9h8v5H4V9z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        Export PDF
+      </button>
+      <button class="save-btn" onclick="saveAssumptions()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 2h8l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5"/><path d="M5 2v4h6V2M5 9h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Save assumptions
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="left">
+
+    <!-- Shared: market, currency, locations, hourly cost, growth -->
+    <div class="card">
+      <div class="sec">Market &amp; currency</div>
+      <select id="currency" onchange="onCurrencyChange()">
+        <option value="EUR">EUR — Euro</option>
+        <option value="NOK">NOK — Norwegian Krone</option>
+        <option value="DKK">DKK — Danish Krone</option>
+        <option value="CHF">CHF — Swiss Franc</option>
+        <option value="GBP">GBP — British Pound</option>
+      </select>
+      <div class="markets">
+        <button class="market-btn" onclick="applyMarket('norway',this)"><span class="flag">NO</span>Norway</button>
+        <button class="market-btn" onclick="applyMarket('denmark',this)"><span class="flag">DK</span>Denmark</button>
+        <button class="market-btn" onclick="applyMarket('benelux',this)"><span class="flag">BE</span>Benelux</button>
+        <button class="market-btn" onclick="applyMarket('germany',this)"><span class="flag">DE</span>Germany</button>
+        <button class="market-btn" onclick="applyMarket('switzerland',this)"><span class="flag">CH</span>Switzerland</button>
+        <button class="market-btn" onclick="applyMarket('italy',this)"><span class="flag">IT</span>Italy</button>
+        <button class="market-btn" onclick="applyMarket('uk',this)"><span class="flag">UK</span>UK</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec">Dealership profile (shared)</div>
+      <div class="row"><label>Number of locations</label><input type="range" id="loc" min="1" max="50" step="1" value="5" oninput="update()"><span class="val" id="loc-v">5</span></div>
+      <div class="row editable"><label>Admin cost (per hr)</label><input type="range" id="hrc" min="10" max="100" step="5" value="40" oninput="clearDirty('hrc-n');syncNum('hrc','hrc-n',0,true);update()"><input type="number" id="hrc-n" class="num-input" value="40" oninput="syncSlider('hrc-n','hrc',true);update()"><span class="num-unit curr-sym">€</span></div>
+      <div class="row"><label>Annual growth rate</label><input type="range" id="grw" min="0" max="15" step="1" value="3" oninput="update()"><span class="val" id="grw-v">3%</span></div>
+    </div>
+
+    <!-- Aftersales inputs -->
+    <div id="left-as" class="view-section active">
+      <div class="card">
+        <div class="sec">Aftersales — scenario</div>
+        <div class="presets">
+          <button class="preset-btn" onclick="applyScenario(5,this)">Simple<small>5 min</small></button>
+          <button class="preset-btn active" onclick="applyScenario(10,this)">Typical<small>10 min</small></button>
+          <button class="preset-btn" onclick="applyScenario(15,this)">Complex<small>15 min</small></button>
+        </div>
+        <div class="row"><label>Payments / month (per location)</label><input type="range" id="ppm" min="50" max="1000" step="5" value="150" oninput="update()"><span class="val" id="ppm-v">150</span></div>
+        <div class="row editable"><label>Avg payment value</label><input type="range" id="apv" min="100" max="3000" step="50" value="2706" oninput="clearDirty('apv-n');syncNum('apv','apv-n',0,true);update()"><input type="number" id="apv-n" class="num-input" value="2706" oninput="syncSlider('apv-n','apv',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row"><label>Admin min / payment (now)</label><input type="range" id="mpc" min="3" max="30" step="1" value="10" oninput="update()"><span class="val" id="mpc-v">10 min</span></div>
+        <div class="row"><label>Admin min / payment (Spense)</label><input type="range" id="mps" min="1" max="10" step="1" value="3" oninput="update()"><span class="val" id="mps-v">3 min</span></div>
+      </div>
+      <div class="card">
+        <div class="sec">Aftersales — Spense pricing</div>
+        <div class="row editable"><label>Monthly license / location</label><input type="range" id="lic" min="0" max="800" step="5" value="275" oninput="clearDirty('lic-n');syncNum('lic','lic-n',0,true);update()"><input type="number" id="lic-n" class="num-input" value="275" oninput="syncSlider('lic-n','lic',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Terminal integration / mo (per terminal)</label><input type="range" id="trm" min="0" max="300" step="5" value="50" oninput="clearDirty('trm-n');syncNum('trm','trm-n',0,true);update()"><input type="number" id="trm-n" class="num-input" value="50" oninput="syncSlider('trm-n','trm',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row"><label>POS terminals per location</label><input type="range" id="trm-cnt" min="1" max="4" step="1" value="1" oninput="update()"><span class="val" id="trm-cnt-v">1</span></div>
+        <div class="row editable"><label>Transaction fee (%)</label><input type="range" id="txf" min="0" max="0.50" step="0.01" value="0.05" oninput="clearDirty('txf-n');syncNum('txf','txf-n',2);update()"><input type="number" id="txf-n" class="num-input" value="0.05" oninput="syncSlider('txf-n','txf');update()"><span class="num-unit">%</span></div>
+        <div class="row editable"><label>Impl. fee / location</label><input type="range" id="ifl" min="0" max="3000" step="10" value="750" oninput="clearDirty('ifl-n');syncNum('ifl','ifl-n',0,true);update()"><input type="number" id="ifl-n" class="num-input" value="750" oninput="syncSlider('ifl-n','ifl',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Total onboarding hours</label><input type="range" id="obh" min="0" max="80" step="1" value="20" oninput="clearDirty('obh-n');syncNum('obh','obh-n');update()"><input type="number" id="obh-n" class="num-input" value="20" oninput="syncSlider('obh-n','obh');update()"><span class="num-unit">hrs</span></div>
+      </div>
+      <div class="card">
+        <div class="sec">Optional assumptions</div>
+        <div class="toggle-row amber-toggle" onclick="toggleHiddenComplexity()">
+          <div class="toggle-track amber" id="t-hidden"><div class="toggle-thumb"></div></div>
+          <div><div class="toggle-label">Include hidden complexity</div><div class="toggle-desc">Adds uplift for refunds, split payments &amp; errors</div></div>
+        </div>
+        <div id="hidden-rows" class="hidden" style="margin-bottom:7px">
+          <div class="row" style="margin-top:6px"><label>Complexity uplift %</label><input type="range" id="hcup" min="10" max="80" step="5" value="35" oninput="update()"><span class="val" id="hcup-v">+35%</span></div>
+        </div>
+        <div class="toggle-row" onclick="togglePsp()">
+          <div class="toggle-track" id="t-psp"><div class="toggle-thumb"></div></div>
+          <div><div class="toggle-label">Include PSP gateway fees</div><div class="toggle-desc">Added to both sides — shows total ops cost in context</div></div>
+        </div>
+        <div id="psp-rows" class="hidden" style="margin-bottom:7px">
+          <div class="row" style="margin-top:6px"><label>PSP fee (%)</label><input type="range" id="psf" min="0.1" max="3" step="0.1" value="0.8" oninput="update()"><span class="val" id="psf-v">0.8%</span></div>
+        </div>
+        <div class="sec">Transition / overlap costs</div>
+        <div class="toggle-row" onclick="toggleOverlap()">
+          <div class="toggle-track" id="t-overlap"><div class="toggle-thumb"></div></div>
+          <div><div class="toggle-label">Include temporary overlap costs</div><div class="toggle-desc">Legacy terminal &amp; PSP costs during transition</div></div>
+        </div>
+        <div id="overlap-rows" class="hidden" style="margin-top:6px">
+          <div class="row"><label>Overlap duration (months)</label><input type="range" id="ovd" min="1" max="36" step="1" value="2" oninput="update()"><span class="val" id="ovd-v">2 mo</span></div>
+          <div class="row editable"><label>Legacy terminal / loc / mo</label><input type="range" id="ovt" min="0" max="500" step="25" value="150" oninput="clearDirty('ovt-n');syncNum('ovt','ovt-n',0,true);update()"><input type="number" id="ovt-n" class="num-input" value="150" oninput="syncSlider('ovt-n','ovt',true);update()"><span class="num-unit curr-sym">€</span></div>
+          <div class="row editable"><label>Legacy PSP / loc / mo</label><input type="range" id="ovp" min="0" max="500" step="25" value="100" oninput="clearDirty('ovp-n');syncNum('ovp','ovp-n',0,true);update()"><input type="number" id="ovp-n" class="num-input" value="100" oninput="syncSlider('ovp-n','ovp',true);update()"><span class="num-unit curr-sym">€</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Car Sales inputs -->
+    <div id="left-cs" class="view-section">
+      <div class="card">
+        <div class="sec">Car sales — volume</div>
+        <div class="row"><label>Cars sold / month (per location)</label><input type="range" id="cs-cpm" min="5" max="200" step="5" value="70" oninput="update()"><span class="val" id="cs-cpm-v">70</span></div>
+        <div class="row editable"><label>Avg car value</label><input type="range" id="cs-acv" min="20000" max="1000000" step="5000" value="250000" oninput="clearDirty('cs-acv-n');syncNum('cs-acv','cs-acv-n',0,true);update()"><input type="number" id="cs-acv-n" class="num-input" value="250000" oninput="syncSlider('cs-acv-n','cs-acv',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="sec">Admin time per transaction</div>
+        <div class="row"><label>Minutes wasted per car (now)</label><input type="range" id="cs-mpc" min="2" max="30" step="1" value="10" oninput="update()"><span class="val" id="cs-mpc-v">10 min</span></div>
+        <div class="row"><label>Minutes per car (Spense)</label><input type="range" id="cs-mps" min="1" max="10" step="1" value="1" oninput="update()"><span class="val" id="cs-mps-v">1 min</span></div>
+      </div>
+      <div class="card">
+        <div class="sec">Car sales — Spense pricing</div>
+        <div class="row editable"><label>Monthly license / location</label><input type="range" id="cs-lic" min="0" max="2000" step="10" value="133" oninput="clearDirty('cs-lic-n');syncNum('cs-lic','cs-lic-n',0,true);update()"><input type="number" id="cs-lic-n" class="num-input" value="133" oninput="syncSlider('cs-lic-n','cs-lic',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Fee per car sold</label><input type="range" id="cs-fpc" min="0" max="50" step="1" value="4" oninput="clearDirty('cs-fpc-n');syncNum('cs-fpc','cs-fpc-n',0,true);update()"><input type="number" id="cs-fpc-n" class="num-input" value="4" oninput="syncSlider('cs-fpc-n','cs-fpc',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Impl. fee / location</label><input type="range" id="cs-ifl" min="0" max="3000" step="50" value="500" oninput="clearDirty('cs-ifl-n');syncNum('cs-ifl','cs-ifl-n',0,true);update()"><input type="number" id="cs-ifl-n" class="num-input" value="500" oninput="syncSlider('cs-ifl-n','cs-ifl',true);update()"><span class="num-unit curr-sym">€</span></div>
+      </div>
+      <div class="card">
+        <div class="sec">Key handover risk (optional)</div>
+        <div class="toggle-row" onclick="toggleRisk()">
+          <div class="toggle-track" id="t-risk"><div class="toggle-thumb"></div></div>
+          <div><div class="toggle-label">Include key handover risk</div><div class="toggle-desc">Estimated incidents × avg car value = annual exposure</div></div>
+        </div>
+        <div id="risk-rows" class="hidden" style="margin-top:6px">
+          <div class="row"><label>Incidents per year (group)</label><input type="range" id="cs-riy" min="0" max="20" step="1" value="2" oninput="update()"><span class="val" id="cs-riy-v">2</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Combined hint -->
+    <div id="left-combined" class="view-section">
+      <div class="card" style="background:var(--blue-bg);border-color:rgba(61,96,245,0.2)">
+        <div class="sec" style="color:var(--blue-text)">Combined view</div>
+        <p style="font-size:12px;color:var(--blue-text);line-height:1.6">Configure each product using the Aftersales and Car Sales tabs, then return here to see the total business case.</p>
+      </div>
+    </div>
+
+  </div><!-- /left -->
+
+  <div id="right">
+
+    <!-- Print header -->
+    <div class="print-masthead" style="display:none">
+      <div class="pm-left">
+        <svg class="pm-logo-icon" viewBox="0 0 32 32" fill="none"><rect x="2" y="14" width="10" height="10" rx="2" fill="#3d60f5"/><rect x="14" y="2" width="10" height="10" rx="2" fill="#3d60f5" opacity=".6"/><rect x="14" y="14" width="10" height="10" rx="2" fill="#3d60f5"/><rect x="2" y="2" width="10" height="10" rx="2" fill="#3d60f5" opacity=".3"/></svg>
+        <span class="pm-logo-text">spense</span>
+        <span class="pm-sep" id="print-view-label">ROI &amp; TCO Calculator</span>
+      </div>
+      <div class="pm-date" id="print-date"></div>
+    </div>
+    <div class="print-params" style="display:none" id="print-params"></div>
+
+    <!-- ═══ AFTERSALES ═══ -->
+    <div id="view-as" class="view-section active">
+      <div class="badges" id="as-badges"></div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-label">Annual savings</div><div class="kpi-value large blue" id="as-ann-sav">—</div><div class="kpi-sub">vs current admin cost</div></div>
+        <div class="kpi"><div class="kpi-label">5-year net savings</div><div class="kpi-value large blue" id="as-5yr-sav">—</div><div class="kpi-sub">after implementation cost</div></div>
+        <div class="kpi"><div class="kpi-label">Payback period</div><div class="kpi-value dark" id="as-payback">—</div><div class="kpi-sub">to recover investment</div></div>
+        <div class="kpi"><div class="kpi-label">5-year ROI</div><div class="kpi-value dark" id="as-roi">—</div><div class="kpi-sub" id="as-roi-sub">—</div></div>
+      </div>
+      <div class="kpi-grid-3">
+        <div class="kpi"><div class="kpi-label">FTE equivalent saved</div><div class="kpi-value dark" style="font-size:24px" id="as-fte">—</div><div class="kpi-sub" id="as-fte-sub">—</div></div>
+        <div class="kpi"><div class="kpi-label">Cost / payment (now)</div><div class="kpi-value dark" style="font-size:20px" id="as-cpp-b">—</div><div class="kpi-sub">admin cost per transaction</div></div>
+        <div class="kpi"><div class="kpi-label">Cost / payment (Spense)</div><div class="kpi-value dark" style="font-size:20px" id="as-cpp-a">—</div><div class="kpi-sub">all-in cost per transaction</div></div>
+      </div>
+      <div class="print-lower" style="display:contents">
+        <div class="card"><div class="sec" style="margin-top:0">Implementation cost</div><div id="as-impl"></div></div>
+        <div class="card"><div class="sec" style="margin-top:0">5-year summary</div>
+          <table><thead><tr><th>Year</th><th style="text-align:right">Without</th><th style="text-align:right">With Spense</th><th style="text-align:right">Savings</th></tr></thead><tbody id="as-tbl"></tbody></table>
+        </div>
+        <div class="card"><div class="chart-title">5-year cost trajectory</div>
+          <div class="chart-legend"><span><i style="background:#c0392b"></i>Without Spense</span><span><i style="background:#3d60f5"></i>With Spense</span></div>
+          <div id="as-lineChart-wrap" style="position:relative;height:200px"><canvas id="as-lineChart"></canvas></div>
+        </div>
+      </div>
+      <div class="charts-2col" style="margin-top:10px">
+        <div class="card"><div class="chart-title">Annual cost breakdown</div>
+          <div class="chart-legend"><span><i style="background:#c0392b"></i>Admin</span><span><i style="background:#3d60f5"></i>Spense fees</span></div>
+          <div style="position:relative;height:180px"><canvas id="as-barChart"></canvas></div>
+        </div>
+        <div class="card"><div class="chart-title">Annual savings by year</div>
+          <div class="chart-legend"><span><i style="background:#3d60f5"></i>Savings</span></div>
+          <div style="position:relative;height:180px"><canvas id="as-savChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CAR SALES ═══ -->
+    <div id="view-cs" class="view-section">
+      <div class="badges" id="cs-badges"></div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-label">Annual savings</div><div class="kpi-value large blue" id="cs-ann-sav">—</div><div class="kpi-sub">admin time recovered</div></div>
+        <div class="kpi"><div class="kpi-label">5-year net savings</div><div class="kpi-value large blue" id="cs-5yr-sav">—</div><div class="kpi-sub">after implementation cost</div></div>
+        <div class="kpi"><div class="kpi-label">Payback period</div><div class="kpi-value dark" id="cs-payback">—</div><div class="kpi-sub">to recover investment</div></div>
+        <div class="kpi"><div class="kpi-label">5-year ROI</div><div class="kpi-value dark" id="cs-roi">—</div><div class="kpi-sub" id="cs-roi-sub">—</div></div>
+      </div>
+      <div class="kpi-grid-3">
+        <div class="kpi"><div class="kpi-label">FTE equivalent saved</div><div class="kpi-value dark" style="font-size:24px" id="cs-fte">—</div><div class="kpi-sub" id="cs-fte-sub">—</div></div>
+        <div class="kpi"><div class="kpi-label">Annual Spense cost</div><div class="kpi-value dark" style="font-size:20px" id="cs-cost">—</div><div class="kpi-sub">license + per-car fees</div></div>
+        <div class="kpi"><div class="kpi-label">Annual risk exposure</div><div class="kpi-value dark" style="font-size:20px" id="cs-risk">—</div><div class="kpi-sub" id="cs-risk-sub">key handover incidents</div></div>
+      </div>
+      <div class="print-lower" style="display:contents">
+        <div class="card"><div class="sec" style="margin-top:0">Implementation cost</div><div id="cs-impl"></div></div>
+        <div class="card"><div class="sec" style="margin-top:0">5-year summary</div>
+          <table><thead><tr><th>Year</th><th style="text-align:right">Without</th><th style="text-align:right">With Spense</th><th style="text-align:right">Savings</th></tr></thead><tbody id="cs-tbl"></tbody></table>
+        </div>
+        <div class="card"><div class="chart-title">5-year cost trajectory</div>
+          <div class="chart-legend"><span><i style="background:#c0392b"></i>Without Spense</span><span><i style="background:#1a7a52"></i>With Spense</span></div>
+          <div id="cs-lineChart-wrap" style="position:relative;height:200px"><canvas id="cs-lineChart"></canvas></div>
+        </div>
+      </div>
+      <div class="charts-2col" style="margin-top:10px">
+        <div class="card"><div class="chart-title">Annual cost breakdown</div>
+          <div class="chart-legend"><span><i style="background:#c0392b"></i>Admin</span><span><i style="background:#1a7a52"></i>Spense fees</span></div>
+          <div style="position:relative;height:180px"><canvas id="cs-barChart"></canvas></div>
+        </div>
+        <div class="card"><div class="chart-title">Annual savings by year</div>
+          <div class="chart-legend"><span><i style="background:#1a7a52"></i>Savings</span></div>
+          <div style="position:relative;height:180px"><canvas id="cs-savChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ COMBINED ═══ -->
+    <div id="view-combined" class="view-section">
+      <div class="kpi-grid-4" style="margin-bottom:12px;grid-template-columns:1fr 1fr 1fr 1fr 1fr">
+        <div class="kpi accent-as"><div class="kpi-label">Aftersales — annual</div><div class="kpi-value large blue" id="comb-as-ann">—</div><div class="kpi-sub" id="comb-as-5yr">—</div></div>
+        <div class="kpi accent-cs"><div class="kpi-label">Car sales — annual</div><div class="kpi-value large green" id="comb-cs-ann">—</div><div class="kpi-sub" id="comb-cs-5yr">—</div></div>
+        <div class="kpi accent-total"><div class="kpi-label">Combined — annual</div><div class="kpi-value large" id="comb-total-ann">—</div><div class="kpi-sub" id="comb-total-5yr">—</div></div>
+        <div class="kpi"><div class="kpi-label">Combined payback</div><div class="kpi-value dark" id="comb-payback">—</div><div class="kpi-sub" id="comb-roi">—</div></div>
+        <div class="kpi"><div class="kpi-label">Total FTE saved</div><div class="kpi-value dark" style="font-size:24px" id="comb-fte">—</div><div class="kpi-sub" id="comb-fte-sub">combined hrs / year</div></div>
+      </div>
+      <div class="card">
+        <div class="sec" style="margin-top:0">Combined 5-year summary</div>
+        <table><thead><tr><th>Year</th><th style="text-align:right">Aftersales savings</th><th style="text-align:right">Car sales savings</th><th style="text-align:right">Combined savings</th></tr></thead><tbody id="comb-tbl"></tbody></table>
+      </div>
+      <div class="card" style="margin-top:10px">
+        <div class="chart-title">Combined savings by year</div>
+        <div class="chart-legend"><span><i style="background:#3d60f5"></i>Aftersales</span><span><i style="background:#1a7a52"></i>Car Sales</span></div>
+        <div id="comb-chart-wrap" style="position:relative;height:220px"><canvas id="comb-chart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="print-footer" style="display:none">
+      <div class="print-disclaimer-text">All figures are estimates based on inputs provided. Exchange rates are assumptions and do not reflect live market data. Results are for indicative purposes only.</div>
+      <div class="print-footer-logo">
+        <svg class="print-footer-logo-icon" viewBox="0 0 32 32" fill="none"><rect x="2" y="14" width="10" height="10" rx="2" fill="#3d60f5"/><rect x="14" y="2" width="10" height="10" rx="2" fill="#3d60f5" opacity=".6"/><rect x="14" y="14" width="10" height="10" rx="2" fill="#3d60f5"/><rect x="2" y="2" width="10" height="10" rx="2" fill="#3d60f5" opacity=".3"/></svg>
+        spense
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p style="font-size:11px;color:var(--text3);font-family:var(--body)">All figures are estimates based on inputs provided. Exchange rates are assumptions and do not reflect live market data. Results are for indicative purposes only.</p>
+</footer>
+
+<script>
+// Capture own source and full page HTML immediately at parse time — before any DOM mutations
+var _ownSource=document.currentScript.textContent
+var _pageHTML=document.documentElement.outerHTML
+// Exchange rates are assumptions — update as needed. 1 EUR = X [currency]
+const RATES={EUR:1,NOK:11.65,DKK:7.46,CHF:0.96,GBP:0.86}
+const SYMS={EUR:'€',NOK:'kr',DKK:'kr',CHF:'CHF',GBP:'£'}
+// Denmark car sales: DKK 990/loc/mo = ~133 EUR; DKK 30/car = ~4 EUR
+const MARKETS={
+  norway:      {currency:'NOK',ppm:350,apv:2706,mpc:10,mps:3,hrc:40, grw:3,loc:5,csLic:85, csFpc:3},
+  denmark:     {currency:'DKK',ppm:229,apv:640, mpc:10,mps:3,hrc:38, grw:3,loc:5,csLic:133,csFpc:4},
+  benelux:     {currency:'EUR',ppm:350,apv:2700,mpc:10,mps:3,hrc:32, grw:3,loc:5,csLic:133,csFpc:4},
+  germany:     {currency:'EUR',ppm:340,apv:2800,mpc:10,mps:3,hrc:30, grw:3,loc:5,csLic:133,csFpc:4},
+  switzerland: {currency:'CHF',ppm:350,apv:2800,mpc:10,mps:3,hrc:55, grw:3,loc:5,csLic:133,csFpc:4},
+  italy:       {currency:'EUR',ppm:300,apv:2400,mpc:10,mps:3,hrc:24, grw:3,loc:5,csLic:133,csFpc:4},
+  uk:          {currency:'GBP',ppm:350,apv:2500,mpc:10,mps:3,hrc:28, grw:3,loc:5,csLic:133,csFpc:4},
+}
+
+let currency='EUR', hiddenOn=false, pspOn=false, overlapOn=false, riskOn=false, currentView='as'
+
+// @@DEFAULTS_START@@
+var DEFAULTS={
+  currency:'EUR',
+  hiddenOn:false,pspOn:false,overlapOn:false,riskOn:false,
+  view:'as',
+  loc:5,hrc:40,grw:3,
+  ppm:150,apv:2706,mpc:10,mps:3,
+  lic:275,trm:50,trmCnt:1,txf:0.05,ifl:750,obh:20,
+  hcup:35,psf:0.8,ovd:2,ovt:150,ovp:100,
+  csCpm:70,csAcv:250000,csMpc:10,csMps:1,
+  csLic:133,csFpc:4,csIfl:500,csRiy:2
+}
+// @@DEFAULTS_END@@
+
+function v(id){return parseFloat(document.getElementById(id).value)}
+function sv(id,val){document.getElementById(id).value=val}
+function el(id){return document.getElementById(id)}
+function safe(n){return isFinite(n)&&!isNaN(n)?n:0}
+function toD(eur){return eur*RATES[currency]}
+function fmt(eur,compact=false){
+  const val=Math.round(toD(eur)),sym=SYMS[currency]
+  if(compact){if(Math.abs(val)>=1e6)return sym+(val/1e6).toFixed(2)+'M';if(Math.abs(val)>=1000)return sym+Math.round(val/1000).toLocaleString()+'K'}
+  return sym+val.toLocaleString()
+}
+function fmtM(m){return(!isFinite(m)||m<=0)?'—':Math.round(m)+' mo'}
+
+function calcAS(){
+  const ppm=v('ppm'),apv=v('apv'),loc=v('loc'),hrc=v('hrc'),grw=v('grw')/100
+  const uplift=hiddenOn?1+v('hcup')/100:1
+  const mpc=v('mpc')*uplift,mps=v('mps')*uplift
+  const lic=v('lic'),trm=v('trm'),trmCnt=v('trm-cnt'),txf=v('txf')/100,ifl=v('ifl'),obh=v('obh')
+  const pspPct=pspOn?v('psf')/100:0
+  const tPpm=ppm*loc,annVol=safe(tPpm*apv*12)
+  const admCur=safe((tPpm*mpc/60)*12*hrc),admSp=safe((tPpm*mps/60)*12*hrc)
+  const hrsCur=safe((tPpm*mpc/60)*12),hrsSp=safe((tPpm*mps/60)*12)
+  const annLic=safe(lic*loc*12 + trm*trmCnt*loc*12),annTxf=safe(annVol*txf),annPsp=safe(annVol*pspPct)
+  const withSp=safe(admSp+annLic+annTxf+annPsp),curFull=safe(admCur+annPsp)
+  const annSav=safe(curFull-withSp)
+  const overlapT=overlapOn?safe((v('ovt')+v('ovp'))*v('ovd')*loc):0
+  const intCost=safe(obh*hrc),swCost=safe(ifl*loc),implCost=safe(swCost+intCost+overlapT)
+  const payback=annSav>0?safe(implCost/(annSav/12)):Infinity
+  const hrsSaved=safe(hrsCur-hrsSp),fte=safe(hrsSaved/1600)
+  const tPay=tPpm*12,cppB=tPay>0?safe(curFull/tPay):0,cppA=tPay>0?safe(withSp/tPay):0
+  const yd=[],grwR=grw
+  let s5c=0,s5s=0
+  for(let y=1;y<=5;y++){
+    const f=Math.pow(1+grwR,y-1),pY=tPpm*f,vY=pY*apv*12
+    const cY=safe((pY*mpc/60)*12*hrc),sY=safe((pY*mps/60)*12*hrc)
+    const tY=safe(vY*txf),pY2=safe(vY*pspPct)
+    const wY=safe(sY+annLic+tY+pY2),cYf=safe(cY+pY2)
+    s5c+=cYf;s5s+=wY;yd.push({year:y,cur:cYf,sp:wY,sav:cYf-wY})
+  }
+  const fw=safe(s5s+implCost),fSav=safe(s5c-fw),roiM=fw>0?safe(fSav/fw):0
+  return{annVol,admCur,admSp,annLic,annTxf,annPsp,withSp,annSav,implCost,swCost,intCost,overlapT,payback,hrsSaved,fte,cppB,cppA,yd,s5c,fw,fSav,roiM,roiP:roiM*100}
+}
+
+function calcCS(){
+  const loc=v('loc'),hrc=v('hrc'),grw=v('grw')/100
+  const cpm=v('cs-cpm'),mpc=v('cs-mpc'),mps=v('cs-mps')
+  const csLic=v('cs-lic'),csFpc=v('cs-fpc'),ifl=v('cs-ifl')
+  const acv=v('cs-acv'),tCpm=cpm*loc
+  const admCur=safe((tCpm*mpc/60)*12*hrc),admSp=safe((tCpm*mps/60)*12*hrc)
+  const hrsCur=safe((tCpm*mpc/60)*12),hrsSp=safe((tCpm*mps/60)*12)
+  const annLic=safe(csLic*loc*12),annFpc=safe(csFpc*tCpm*12)
+  const spCost=safe(annLic+annFpc),withSp=safe(admSp+spCost)
+  const annSav=safe(admCur-withSp)
+  const riskExp=riskOn?safe(v('cs-riy')*acv):0
+  const implCost=safe(ifl*loc)
+  const payback=annSav>0?safe(implCost/(annSav/12)):Infinity
+  const hrsSaved=safe(hrsCur-hrsSp),fte=safe(hrsSaved/1600)
+  const yd=[];let s5c=0,s5s=0
+  for(let y=1;y<=5;y++){
+    const f=Math.pow(1+grw,y-1),pY=tCpm*f
+    const cY=safe((pY*mpc/60)*12*hrc),sY=safe((pY*mps/60)*12*hrc)
+    const wY=safe(sY+annLic+safe(csFpc*pY*12))
+    s5c+=cY;s5s+=wY;yd.push({year:y,cur:cY,sp:wY,sav:cY-wY})
+  }
+  const fw=safe(s5s+implCost),fSav=safe(s5c-fw),roiM=fw>0?safe(fSav/fw):0
+  return{admCur,admSp,annLic,annFpc,spCost,withSp,annSav,implCost,riskExp,payback,hrsSaved,fte,yd,s5c,fw,fSav,roiM,roiP:roiM*100}
+}
+
+const CH={}
+function dc(id){if(CH[id]){CH[id].destroy();delete CH[id]}}
+function mkLine(id,labels,curD,spD,col){
+  dc(id)
+  const tf=v=>{const a=Math.abs(v),s=SYMS[currency];if(a>=1e6)return s+(v/1e6).toFixed(1)+'M';if(a>=1000)return s+Math.round(v/1000)+'K';return s+v}
+  const ts={fontSize:10,fontFamily:'Open Sans',color:'#999'}
+  const tip={callbacks:{label:ctx=>`${ctx.dataset.label}: ${SYMS[currency]}${Math.round(ctx.raw).toLocaleString()}`},backgroundColor:'#fff',borderColor:'rgba(0,0,0,0.1)',borderWidth:1,titleColor:'#999',bodyColor:'#1a1a1a',padding:10,cornerRadius:6}
+  const bgCol=col==='#1a7a52'?'rgba(26,122,82,0.06)':'rgba(61,96,245,0.06)'
+  CH[id]=new Chart(el(id),{type:'line',data:{labels,datasets:[
+    {label:'Without Spense',data:curD,borderColor:'#c0392b',backgroundColor:'rgba(192,57,43,0.06)',tension:.35,fill:true,pointRadius:4,pointBackgroundColor:'#c0392b',pointBorderWidth:0},
+    {label:'With Spense',data:spD,borderColor:col,backgroundColor:bgCol,tension:.35,fill:true,pointRadius:4,pointBackgroundColor:col,pointBorderWidth:0},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tip},scales:{y:{ticks:{callback:tf,...ts},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}},x:{ticks:{...ts},grid:{display:false},border:{display:false}}}}})
+}
+function mkBar(id,admCur,admSp,fees,col){
+  dc(id)
+  const tf=v=>{const a=Math.abs(v),s=SYMS[currency];if(a>=1e6)return s+(v/1e6).toFixed(1)+'M';if(a>=1000)return s+Math.round(v/1000)+'K';return s+v}
+  const ts={fontSize:10,fontFamily:'Open Sans',color:'#999'}
+  const tip={callbacks:{label:ctx=>`${ctx.dataset.label}: ${SYMS[currency]}${Math.round(ctx.raw).toLocaleString()}`},backgroundColor:'#fff',borderColor:'rgba(0,0,0,0.1)',borderWidth:1,titleColor:'#999',bodyColor:'#1a1a1a',padding:10,cornerRadius:6}
+  const col2=col==='#1a7a52'?'#0f5c3a':'#2a47d4'
+  CH[id]=new Chart(el(id),{type:'bar',data:{labels:['Current','With Spense'],datasets:[
+    {label:'Admin cost',data:[Math.round(toD(admCur)),Math.round(toD(admSp))],backgroundColor:['#c0392b',col],borderRadius:4},
+    {label:'Spense fees',data:[0,Math.round(toD(fees))],backgroundColor:col2,borderRadius:4},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tip},scales:{x:{ticks:{...ts},grid:{display:false},border:{display:false},stacked:true},y:{ticks:{callback:tf,...ts},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false},stacked:true}}}})
+}
+function mkSav(id,savD,labels,col){
+  dc(id)
+  const tf=v=>{const a=Math.abs(v),s=SYMS[currency];if(a>=1e6)return s+(v/1e6).toFixed(1)+'M';if(a>=1000)return s+Math.round(v/1000)+'K';return s+v}
+  const ts={fontSize:10,fontFamily:'Open Sans',color:'#999'}
+  const tip={callbacks:{label:ctx=>`Savings: ${SYMS[currency]}${Math.round(ctx.raw).toLocaleString()}`},backgroundColor:'#fff',borderColor:'rgba(0,0,0,0.1)',borderWidth:1,titleColor:'#999',bodyColor:'#1a1a1a',padding:10,cornerRadius:6}
+  CH[id]=new Chart(el(id),{type:'bar',data:{labels,datasets:[{label:'Savings',data:savD,backgroundColor:col,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tip},scales:{x:{ticks:{...ts},grid:{display:false},border:{display:false}},y:{ticks:{callback:tf,...ts},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}}}}})
+}
+function mkStacked(id,asD,csD,labels){
+  dc(id)
+  const tf=v=>{const a=Math.abs(v),s=SYMS[currency];if(a>=1e6)return s+(v/1e6).toFixed(1)+'M';if(a>=1000)return s+Math.round(v/1000)+'K';return s+v}
+  const ts={fontSize:10,fontFamily:'Open Sans',color:'#999'}
+  const tip={callbacks:{label:ctx=>`${ctx.dataset.label}: ${SYMS[currency]}${Math.round(ctx.raw).toLocaleString()}`},backgroundColor:'#fff',borderColor:'rgba(0,0,0,0.1)',borderWidth:1,titleColor:'#999',bodyColor:'#1a1a1a',padding:10,cornerRadius:6}
+  CH[id]=new Chart(el(id),{type:'bar',data:{labels,datasets:[
+    {label:'Aftersales',data:asD,backgroundColor:'#3d60f5',borderRadius:0},
+    {label:'Car Sales',data:csD,backgroundColor:'#1a7a52',borderRadius:4},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tip},scales:{x:{stacked:true,ticks:{...ts},grid:{display:false},border:{display:false}},y:{stacked:true,ticks:{callback:tf,...ts},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}}}}})
+}
+
+function renderAS(d){
+  const lbls=['Year 1','Year 2','Year 3','Year 4','Year 5'],slbls=['Y1','Y2','Y3','Y4','Y5']
+  el('as-badges').innerHTML=`<span class="badge blue">${fmt(d.annVol/12,true)} monthly volume</span><span class="badge green">${Math.round(d.hrsSaved).toLocaleString()} hrs saved/yr</span><span class="badge amber">${d.fte.toFixed(2)} FTE</span>`
+  el('as-ann-sav').textContent=fmt(d.annSav,true)
+  el('as-5yr-sav').textContent=fmt(d.fSav,true)
+  el('as-payback').textContent=fmtM(d.payback)
+  el('as-roi').textContent=Math.round(d.roiP)+'%'
+  el('as-roi-sub').textContent=d.roiM.toFixed(1)+'× cost multiple'
+  el('as-fte').textContent=d.fte.toFixed(2)
+  el('as-fte-sub').textContent=Math.round(d.hrsSaved)+' hrs / year'
+  el('as-cpp-b').textContent=fmt(d.cppB)
+  el('as-cpp-a').textContent=fmt(d.cppA)
+  const ov=d.overlapT>0?`<div class="breakdown-row"><span class="breakdown-label">Overlap / transition</span><span class="breakdown-value amber">${fmt(d.overlapT)}</span></div>`:''
+  el('as-impl').innerHTML=`<div class="breakdown-row"><span class="breakdown-label">Software implementation</span><span class="breakdown-value">${fmt(d.swCost)}</span></div><div class="breakdown-row"><span class="breakdown-label">Internal onboarding</span><span class="breakdown-value">${fmt(d.intCost)}</span></div>${ov}<div class="breakdown-row"><span class="breakdown-label">Total implementation</span><span class="breakdown-value">${fmt(d.implCost)}</span></div>`
+  let rows=d.yd.map((y,i)=>`<tr style="${i%2===1?'background:rgba(0,0,0,0.018)':''}"><td class="td-label">Year ${y.year}</td><td>${fmt(y.cur,true)}</td><td>${fmt(y.sp,true)}</td><td class="td-savings">${fmt(y.sav,true)}</td></tr>`).join('')
+  rows+=`<tr class="total-row"><td class="td-label">Total</td><td>${fmt(d.s5c,true)}</td><td>${fmt(d.fw,true)}</td><td class="td-savings">${fmt(d.fSav,true)}</td></tr>`
+  el('as-tbl').innerHTML=rows
+  mkLine('as-lineChart',lbls,d.yd.map(y=>Math.round(toD(y.cur))),d.yd.map(y=>Math.round(toD(y.sp))),'#3d60f5')
+  mkBar('as-barChart',d.admCur,d.admSp,d.annLic+d.annTxf+d.annPsp,'#3d60f5')
+  mkSav('as-savChart',d.yd.map(y=>Math.round(toD(y.sav))),slbls,'#3d60f5')
+}
+
+function renderCS(d){
+  const lbls=['Year 1','Year 2','Year 3','Year 4','Year 5'],slbls=['Y1','Y2','Y3','Y4','Y5']
+  el('cs-badges').innerHTML=`<span class="badge blue">${Math.round(v('cs-cpm')*v('loc'))} cars/mo (group)</span><span class="badge green">${Math.round(d.hrsSaved).toLocaleString()} hrs saved/yr</span><span class="badge amber">${d.fte.toFixed(2)} FTE</span>`
+  el('cs-ann-sav').textContent=fmt(d.annSav,true)
+  el('cs-5yr-sav').textContent=fmt(d.fSav,true)
+  el('cs-payback').textContent=fmtM(d.payback)
+  el('cs-roi').textContent=Math.round(d.roiP)+'%'
+  el('cs-roi-sub').textContent=d.roiM.toFixed(1)+'× cost multiple'
+  el('cs-fte').textContent=d.fte.toFixed(2)
+  el('cs-fte-sub').textContent=Math.round(d.hrsSaved)+' hrs / year'
+  el('cs-cost').textContent=fmt(d.spCost,true)
+  el('cs-risk').textContent=riskOn?fmt(d.riskExp,true):'—'
+  el('cs-risk-sub').textContent=riskOn?`${v('cs-riy')} incidents × avg car value`:'Enable risk toggle to model'
+  el('cs-impl').innerHTML=`<div class="breakdown-row"><span class="breakdown-label">Software implementation</span><span class="breakdown-value">${fmt(d.implCost)}</span></div><div class="breakdown-row"><span class="breakdown-label">Total implementation</span><span class="breakdown-value">${fmt(d.implCost)}</span></div>`
+  let rows=d.yd.map((y,i)=>`<tr style="${i%2===1?'background:rgba(0,0,0,0.018)':''}"><td class="td-label">Year ${y.year}</td><td>${fmt(y.cur,true)}</td><td>${fmt(y.sp,true)}</td><td class="td-savings">${fmt(y.sav,true)}</td></tr>`).join('')
+  rows+=`<tr class="total-row"><td class="td-label">Total</td><td>${fmt(d.s5c,true)}</td><td>${fmt(d.fw,true)}</td><td class="td-savings">${fmt(d.fSav,true)}</td></tr>`
+  el('cs-tbl').innerHTML=rows
+  mkLine('cs-lineChart',lbls,d.yd.map(y=>Math.round(toD(y.cur))),d.yd.map(y=>Math.round(toD(y.sp))),'#1a7a52')
+  mkBar('cs-barChart',d.admCur,d.admSp,d.spCost,'#1a7a52')
+  mkSav('cs-savChart',d.yd.map(y=>Math.round(toD(y.sav))),slbls,'#1a7a52')
+}
+
+function renderCombined(as,cs){
+  const lbls=['Year 1','Year 2','Year 3','Year 4','Year 5']
+  const combAnn=safe(as.annSav+cs.annSav)
+  const combImpl=safe(as.implCost+cs.implCost)
+  const payback=combAnn>0?safe(combImpl/(combAnn/12)):Infinity
+  const c5c=safe(as.s5c+cs.s5c),c5s=safe(as.fw+cs.fw)
+  const c5Sav=safe(c5c-c5s),roi=c5s>0?safe(c5Sav/c5s)*100:0
+  el('comb-as-ann').textContent=fmt(as.annSav,true)
+  el('comb-as-5yr').textContent=fmt(as.fSav,true)+' over 5 years'
+  el('comb-cs-ann').textContent=fmt(cs.annSav,true)
+  el('comb-cs-5yr').textContent=fmt(cs.fSav,true)+' over 5 years'
+  el('comb-total-ann').textContent=fmt(combAnn,true)
+  el('comb-total-5yr').textContent=fmt(c5Sav,true)+' over 5 years'
+  el('comb-payback').textContent=fmtM(payback)
+  el('comb-roi').textContent=Math.round(roi)+'% 5-year ROI'
+  const combHrs=safe(as.hrsSaved+cs.hrsSaved)
+  const combFte=safe(combHrs/1600)
+  el('comb-fte').textContent=combFte.toFixed(2)
+  el('comb-fte-sub').textContent=Math.round(combHrs).toLocaleString()+' hrs / year'
+  let rows=lbls.map((lbl,i)=>{
+    const aS=as.yd[i].sav,cS=cs.yd[i].sav
+    return`<tr style="${i%2===1?'background:rgba(0,0,0,0.018)':''}"><td class="td-label">${lbl}</td><td>${fmt(aS,true)}</td><td>${fmt(cS,true)}</td><td class="td-savings">${fmt(safe(aS+cS),true)}</td></tr>`
+  }).join('')
+  rows+=`<tr class="total-row"><td class="td-label">Total</td><td>${fmt(as.fSav,true)}</td><td>${fmt(cs.fSav,true)}</td><td class="td-savings">${fmt(safe(as.fSav+cs.fSav),true)}</td></tr>`
+  el('comb-tbl').innerHTML=rows
+  mkStacked('comb-chart',as.yd.map(y=>Math.round(toD(y.sav))),cs.yd.map(y=>Math.round(toD(y.sav))),lbls)
+}
+
+function updateHeader(as,cs){
+  let sav,pb,roi
+  if(currentView==='as'){sav=as.annSav;pb=as.payback;roi=as.roiP}
+  else if(currentView==='cs'){sav=cs.annSav;pb=cs.payback;roi=cs.roiP}
+  else{
+    sav=safe(as.annSav+cs.annSav)
+    pb=sav>0?safe((as.implCost+cs.implCost)/(sav/12)):Infinity
+    const c5s=safe(as.fw+cs.fw),c5Sav=safe(as.s5c+cs.s5c-c5s)
+    roi=c5s>0?safe(c5Sav/c5s)*100:0
+  }
+  el('h-savings').textContent=fmt(sav,true)
+  el('h-payback').textContent=fmtM(pb)
+  el('h-roi').textContent=Math.round(roi)+'%'
+}
+
+function updatePrint(as,cs){
+  el('print-date').textContent=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})
+  const vl={'as':'Aftersales ROI & TCO','cs':'Car Sales ROI & TCO','combined':'Combined ROI & TCO'}
+  el('print-view-label').textContent=vl[currentView]
+  let params=currentView==='cs'?[
+    ['Cars/mo (per loc)',Math.round(v('cs-cpm'))],['Locations',Math.round(v('loc'))],
+    ['Avg car value',fmt(v('cs-acv'),true)],['Admin cost/hr',fmt(v('hrc'))],
+    ['Growth',v('grw')+'%'],['Min/car (now)',v('cs-mpc')+' min'],
+    ['Min/car (Spense)',v('cs-mps')+' min'],['License/loc',fmt(v('cs-lic'))],
+    ['Fee/car',fmt(v('cs-fpc'))],['Impl. fee/loc',fmt(v('cs-ifl'))],
+  ]:[
+    ['Pmts/mo (per loc)',Math.round(v('ppm'))],['Locations',Math.round(v('loc'))],
+    ['Avg payment',fmt(v('apv'))],['Admin cost/hr',fmt(v('hrc'))],
+    ['Growth',v('grw')+'%'],['Min/pmt (now)',v('mpc')+' min'],
+    ['Min/pmt (Spense)',v('mps')+' min'],['License/loc',fmt(v('lic'))],
+    ['Terminal/terminal',fmt(v('trm'))],['Terminals/loc',Math.round(v('trm-cnt'))],
+    ['Tx fee',parseFloat(v('txf')).toFixed(2)+'%'],['Impl. fee/loc',fmt(v('ifl'))],
+  ]
+  el('print-params').innerHTML=params.map(([l,val])=>`<div class="print-param"><div class="print-param-label">${l}</div><div class="print-param-value">${val}</div></div>`).join('')
+}
+
+function update(){
+  updateLabels()
+  const as=calcAS(),cs=calcCS()
+  renderAS(as);renderCS(cs);renderCombined(as,cs)
+  updateHeader(as,cs);updatePrint(as,cs)
+}
+
+// Dirty field tracking
+const dirtyFields=new Set()
+function markDirty(id){dirtyFields.add(id)}
+function clearDirty(id){dirtyFields.delete(id)}
+function clearAllDirty(){dirtyFields.clear()}
+
+function syncNum(sid,nid,dec=0,isMoney=false){
+  if(dirtyFields.has(nid))return
+  const eurVal=parseFloat(el(sid).value)
+  const dv=isMoney?eurVal*RATES[currency]:eurVal
+  const ne=el(nid);if(ne)ne.value=dec>0?dv.toFixed(dec):Math.round(dv)
+}
+function syncSlider(nid,sid,isMoney=false){
+  markDirty(nid)
+  const dr=parseFloat(el(nid).value);if(isNaN(dr))return
+  const ev=isMoney?dr/RATES[currency]:dr
+  const sl=el(sid);sl.value=Math.max(parseFloat(sl.min),Math.min(parseFloat(sl.max),ev))
+}
+
+function updateLabels(){
+  const rate=RATES[currency],sym=SYMS[currency]
+  document.querySelectorAll('.curr-sym').forEach(e=>e.textContent=sym)
+  const mf=[['apv','apv-n'],['hrc','hrc-n'],['lic','lic-n'],['trm','trm-n'],['ifl','ifl-n'],
+            ['ovt','ovt-n'],['ovp','ovp-n'],['cs-acv','cs-acv-n'],['cs-lic','cs-lic-n'],
+            ['cs-fpc','cs-fpc-n'],['cs-ifl','cs-ifl-n']]
+  mf.forEach(([sid,nid])=>{if(dirtyFields.has(nid))return;const ne=el(nid);if(ne)ne.value=Math.round(parseFloat(el(sid).value)*rate)})
+  el('loc-v').textContent=Math.round(v('loc'))
+  el('grw-v').textContent=v('grw')+'%'
+  el('ppm-v').textContent=Math.round(v('ppm')).toLocaleString()
+  el('mpc-v').textContent=v('mpc')+' min'
+  el('mps-v').textContent=v('mps')+' min'
+  el('hcup-v').textContent='+'+v('hcup')+'%'
+  el('psf-v').textContent=parseFloat(v('psf')).toFixed(1)+'%'
+  el('ovd-v').textContent=v('ovd')+' mo'
+  el('trm-cnt-v').textContent=Math.round(v('trm-cnt'))
+  el('cs-cpm-v').textContent=Math.round(v('cs-cpm'))
+  el('cs-mpc-v').textContent=v('cs-mpc')+' min'
+  el('cs-mps-v').textContent=v('cs-mps')+' min'
+  el('cs-riy-v').textContent=Math.round(v('cs-riy'))
+}
+
+function switchView(view,btn){
+  currentView=view
+  document.querySelectorAll('.view-tab').forEach(b=>b.classList.remove('active'))
+  btn.classList.add('active')
+  document.querySelectorAll('#right .view-section').forEach(s=>s.classList.remove('active'))
+  el('view-'+view).classList.add('active')
+  // Left panel visibility
+  el('left-as').classList.remove('active')
+  el('left-cs').classList.remove('active')
+  el('left-combined').classList.remove('active')
+  if(view==='combined'){el('left-as').classList.add('active');el('left-cs').classList.add('active');el('left-combined').classList.add('active')}
+  else el('left-'+view).classList.add('active')
+  update()
+}
+
+function toggleHiddenComplexity(){hiddenOn=!hiddenOn;el('t-hidden').classList.toggle('on',hiddenOn);el('hidden-rows').classList.toggle('hidden',!hiddenOn);update()}
+function togglePsp(){pspOn=!pspOn;el('t-psp').classList.toggle('on',pspOn);el('psp-rows').classList.toggle('hidden',!pspOn);update()}
+function toggleOverlap(){overlapOn=!overlapOn;el('t-overlap').classList.toggle('on',overlapOn);el('overlap-rows').classList.toggle('hidden',!overlapOn);update()}
+function toggleRisk(){riskOn=!riskOn;el('t-risk').classList.toggle('on',riskOn);el('risk-rows').classList.toggle('hidden',!riskOn);update()}
+
+function applyMarket(key,btn){
+  const m=MARKETS[key]
+  document.querySelectorAll('.market-btn').forEach(b=>b.classList.remove('active'))
+  if(btn)btn.classList.add('active')
+  currency=m.currency;el('currency').value=m.currency
+  sv('ppm',m.ppm);sv('apv',m.apv);sv('mpc',m.mpc);sv('mps',m.mps)
+  sv('hrc',m.hrc);sv('grw',m.grw);sv('loc',m.loc)
+  sv('cs-lic',m.csLic);sv('cs-fpc',m.csFpc)
+  clearAllDirty()
+  const rate=RATES[currency]
+  const mm={'apv':'apv-n','hrc':'hrc-n','lic':'lic-n','trm':'trm-n','ifl':'ifl-n','ovt':'ovt-n','ovp':'ovp-n','cs-acv':'cs-acv-n','cs-lic':'cs-lic-n','cs-fpc':'cs-fpc-n','cs-ifl':'cs-ifl-n'}
+  Object.entries(mm).forEach(([sid,nid])=>{const n=el(nid);if(n)n.value=Math.round(parseFloat(el(sid).value)*rate)})
+  update()
+}
+
+function onCurrencyChange(){
+  currency=el('currency').value
+  document.querySelectorAll('.market-btn').forEach(b=>b.classList.remove('active'))
+  clearAllDirty()
+  const rate=RATES[currency]
+  const mm={'apv':'apv-n','hrc':'hrc-n','lic':'lic-n','trm':'trm-n','ifl':'ifl-n','ovt':'ovt-n','ovp':'ovp-n','cs-acv':'cs-acv-n','cs-lic':'cs-lic-n','cs-fpc':'cs-fpc-n','cs-ifl':'cs-ifl-n'}
+  Object.entries(mm).forEach(([sid,nid])=>{const n=el(nid);if(n)n.value=Math.round(parseFloat(el(sid).value)*rate)})
+  update()
+}
+
+function saveAssumptions(){
+  // Build new DEFAULTS from current slider values (all in EUR internally)
+  var nd={
+    currency:currency,
+    hiddenOn:hiddenOn,pspOn:pspOn,overlapOn:overlapOn,riskOn:riskOn,
+    view:currentView,
+    loc:v('loc'),hrc:v('hrc'),grw:v('grw'),
+    ppm:v('ppm'),apv:v('apv'),mpc:v('mpc'),mps:v('mps'),
+    lic:v('lic'),trm:v('trm'),trmCnt:v('trm-cnt'),
+    txf:v('txf'),ifl:v('ifl'),
+    obh:v('obh'),hcup:v('hcup'),psf:v('psf'),ovd:v('ovd'),
+    ovt:v('ovt'),ovp:v('ovp'),
+    csCpm:v('cs-cpm'),csAcv:v('cs-acv'),
+    csMpc:v('cs-mpc'),csMps:v('cs-mps'),
+    csLic:v('cs-lic'),csFpc:v('cs-fpc'),
+    csIfl:v('cs-ifl'),csRiy:v('cs-riy')
+  }
+  // Round to avoid floating point noise
+  Object.keys(nd).forEach(function(k){
+    if(typeof nd[k]==='number'&&k!=='txf'&&k!=='psf')
+      nd[k]=Math.round(nd[k]*100)/100
+  })
+
+  var newBlock='// @@DEFAULTS_START@@\nvar DEFAULTS='+JSON.stringify(nd,null,2)+';\n// @@DEFAULTS_END@@'
+
+  function doDownload(sourceHtml){
+    var updated=sourceHtml.replace(/\/\/ @@DEFAULTS_START@@[\s\S]*?\/\/ @@DEFAULTS_END@@/,newBlock)
+    if(updated===sourceHtml){alert('Could not update defaults. Please report this bug.');return}
+    var blob=new Blob([updated],{type:'text/html'})
+    var url=URL.createObjectURL(blob)
+    var a=document.createElement('a')
+    a.href=url; a.download='spense-roi-calculator.html'
+    document.body.appendChild(a); a.click()
+    document.body.removeChild(a); URL.revokeObjectURL(url)
+  }
+
+  // When hosted (http/https), fetch the clean source directly — most reliable
+  if(window.location.protocol==='http:'||window.location.protocol==='https:'){
+    fetch(window.location.href)
+      .then(function(r){return r.text()})
+      .then(function(html){doDownload(html)})
+      .catch(function(){
+        // Fetch failed (e.g. cross-origin iframe) — fall back to captured source
+        if(_pageHTML) doDownload(_pageHTML)
+        else alert('Could not save assumptions. Try opening the calculator directly in a browser tab.')
+      })
+  } else {
+    // Local file:// — use the HTML captured at load time
+    if(_pageHTML) doDownload(_pageHTML)
+    else alert('Could not save assumptions.')
+  }
+}
+
+
+
+function applyScenario(minutes,btn){
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'))
+  if(btn)btn.classList.add('active')
+  sv('mpc',minutes);update()
+}
+
+// Boot — apply DEFAULTS then run
+;(function boot(){
+  currency=DEFAULTS.currency||'EUR'
+  hiddenOn=!!DEFAULTS.hiddenOn
+  pspOn=!!DEFAULTS.pspOn
+  overlapOn=!!DEFAULTS.overlapOn
+  riskOn=!!DEFAULTS.riskOn
+
+  var d=DEFAULTS
+  var svd=function(id,val){var e=document.getElementById(id);if(e)e.value=val}
+  var eld=function(id){return document.getElementById(id)}
+
+  svd('currency',d.currency)
+  svd('loc',d.loc);svd('hrc',d.hrc);svd('hrc-n',Math.round(d.hrc*RATES[d.currency]))
+  svd('grw',d.grw)
+  svd('ppm',d.ppm);svd('apv',d.apv);svd('apv-n',Math.round(d.apv*RATES[d.currency]))
+  svd('mpc',d.mpc);svd('mps',d.mps)
+  svd('lic',d.lic);svd('lic-n',Math.round(d.lic*RATES[d.currency]))
+  svd('trm',d.trm);svd('trm-n',Math.round(d.trm*RATES[d.currency]))
+  svd('trm-cnt',d.trmCnt)
+  svd('txf',d.txf);svd('txf-n',d.txf)
+  svd('ifl',d.ifl);svd('ifl-n',Math.round(d.ifl*RATES[d.currency]))
+  svd('obh',d.obh);svd('obh-n',d.obh)
+  svd('hcup',d.hcup);svd('psf',d.psf)
+  svd('ovd',d.ovd)
+  svd('ovt',d.ovt);svd('ovt-n',Math.round(d.ovt*RATES[d.currency]))
+  svd('ovp',d.ovp);svd('ovp-n',Math.round(d.ovp*RATES[d.currency]))
+  svd('cs-cpm',d.csCpm)
+  svd('cs-acv',d.csAcv);svd('cs-acv-n',Math.round(d.csAcv*RATES[d.currency]))
+  svd('cs-mpc',d.csMpc);svd('cs-mps',d.csMps)
+  svd('cs-lic',d.csLic);svd('cs-lic-n',Math.round(d.csLic*RATES[d.currency]))
+  svd('cs-fpc',d.csFpc);svd('cs-fpc-n',Math.round(d.csFpc*RATES[d.currency]))
+  svd('cs-ifl',d.csIfl);svd('cs-ifl-n',Math.round(d.csIfl*RATES[d.currency]))
+  svd('cs-riy',d.csRiy)
+
+  if(hiddenOn){eld('t-hidden')&&eld('t-hidden').classList.add('on');eld('hidden-rows')&&eld('hidden-rows').classList.remove('hidden')}
+  if(pspOn){eld('t-psp')&&eld('t-psp').classList.add('on');eld('psp-rows')&&eld('psp-rows').classList.remove('hidden')}
+  if(overlapOn){eld('t-overlap')&&eld('t-overlap').classList.add('on');eld('overlap-rows')&&eld('overlap-rows').classList.remove('hidden')}
+  if(riskOn){eld('t-risk')&&eld('t-risk').classList.add('on');eld('risk-rows')&&eld('risk-rows').classList.remove('hidden')}
+
+  // Mark all number inputs dirty so updateLabels() doesn't overwrite them on first render
+  ;['hrc-n','apv-n','lic-n','trm-n','ifl-n','ovt-n','ovp-n',
+    'cs-acv-n','cs-lic-n','cs-fpc-n','cs-ifl-n'].forEach(function(id){markDirty(id)})
+
+  update()
+
+  // Restore saved view (switch after update so charts render correctly)
+  if(DEFAULTS.view&&DEFAULTS.view!=='as'){
+    var tabBtn=document.querySelector('.view-tab[onclick*="\''+DEFAULTS.view+'\'"]')
+    if(tabBtn) switchView(DEFAULTS.view,tabBtn)
+  }
+})();
+</script>
+</body>
+</html>
