@@ -123,7 +123,7 @@ The live URL updates automatically within ~1 minute. No further action needed.
  
 | Version | Changes |
 |---------|---------|
-| v2.5 | Active view saved with assumptions — prospect lands on correct tab automatically; locations slider extended to 50 |
+| v2.5 | Active view saved with assumptions — prospect lands on correct tab automatically; slider snap bug fixed in Save assumptions (sliders now used as source of truth, not number inputs); locations slider extended to 50 |
 | v2.4 | Save assumptions button — downloads personalised copy with current values as defaults; uses fetch when hosted, falls back to captured HTML for local use |
 | v2.3 | POS terminals per location slider added |
 | v2.2 | FTE hours badge bug fixed; combined FTE card added to combined view |
