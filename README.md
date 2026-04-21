@@ -42,6 +42,8 @@ Results include annual savings, 5-year net savings, payback period, 5-year ROI, 
  
 The **Save assumptions** button downloads a personalised copy of the calculator as an HTML file with your current inputs baked in as defaults. The active view (Aftersales, Car Sales, or Combined) is also saved — so the prospect lands on the right tab when they open it.
  
+In the saved copy, **Spense pricing fields are locked as read-only** — visible to the prospect but not editable. All other inputs (volumes, admin times, locations, hourly cost) remain fully adjustable so the prospect can validate the assumptions against their own reality.
+ 
 **Workflow:**
 1. Configure all inputs to match the prospect's situation
 2. Switch to the view you want the prospect to land on
@@ -123,6 +125,7 @@ The live URL updates automatically within ~1 minute. No further action needed.
  
 | Version | Changes |
 |---------|---------|
+| v2.6 | Sliders removed for all monetary fields — number inputs only, eliminates all rounding/snap bugs; Spense pricing fields locked as read-only in saved prospect copies |
 | v2.5 | Active view saved with assumptions — prospect lands on correct tab automatically; slider snap bug fixed in Save assumptions (sliders now used as source of truth, not number inputs); locations slider extended to 50 |
 | v2.4 | Save assumptions button — downloads personalised copy with current values as defaults; uses fetch when hosted, falls back to captured HTML for local use |
 | v2.3 | POS terminals per location slider added |
@@ -142,3 +145,4 @@ The live URL updates automatically within ~1 minute. No further action needed.
 **Nellemann A/S (Denmark)** — kr295K annual savings at 10 min conservative baseline. 5 locations, 229 payments/month per location.
  
 **Bil i Nord (Norway)** — kr592K combined annual savings (kr527K aftersales + kr64K car sales). 9 locations, 165 payments/month, 25 cars/month per location, 18 min car admin time. 14 month payback, 29% 5-year ROI.
+ 
