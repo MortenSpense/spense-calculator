@@ -1043,19 +1043,33 @@ function doPublish(){
     return updated
   }
 
-  function sendToWorker(html){
+  function sendToWorker(html,force){
     fetch(PUBLISH_WORKER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+PUBLISH_SECRET_TOKEN},
-      body:JSON.stringify({html:html,prospectSlug:slug,publishedBy:repName||'Spense',prospectName:prospectName})
+      body:JSON.stringify({html:html,prospectSlug:slug,publishedBy:repName||'Spense',prospectName:prospectName,force:!!force})
     })
-    .then(function(r){return r.json()})
+    .then(function(r){
+      if(r.status===409){
+        return r.json().then(function(c){
+          var m=c.existing||{}
+          var msg='A calculator for "'+(m.prospectName||slug)+'" was already published'
+            +(m.publishedBy?' by '+m.publishedBy:'')
+            +(m.createdAt?' on '+new Date(m.createdAt).toLocaleDateString():'')
+            +'.\n\nOverwrite it?'
+          if(confirm(msg)){sendToWorker(html,true)}
+          else{el('publish-submit-btn').disabled=false;el('publish-submit-btn').textContent='Publish'}
+        })
+      }
+      return r.json()
+    })
     .then(function(data){
+      if(!data)return
       if(data.url){
         el('publish-url').textContent=data.url
         el('publish-result').classList.remove('hidden')
         el('publish-submit-btn').textContent='Published'
-      } else {
+      }else{
         throw new Error(data.error||'Unknown error')
       }
     })
