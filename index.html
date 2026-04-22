@@ -957,7 +957,13 @@ function applyScenario(minutes,btn){
     <div class="modal-label">Prospect name</div>
     <input type="text" id="publish-prospect" class="modal-input" placeholder="e.g. Ejner Hessel" oninput="updatePublishSlug()">
     <div class="modal-label">Your name</div>
-    <input type="text" id="publish-rep" class="modal-input" placeholder="e.g. Morten Spense">
+    <select id="publish-rep" class="modal-input">
+      <option value="">Select your name…</option>
+      <option value="Lars Vangen Jordet">Lars Vangen Jordet</option>
+      <option value="Didrik Jarlsby">Didrik Jarlsby</option>
+      <option value="Morten Olsson">Morten Olsson</option>
+      <option value="Claus Persson">Claus Persson</option>
+    </select>
     <div class="modal-label" style="color:var(--text3);font-size:10px">URL slug (auto-generated)</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:.8rem;font-family:var(--body)" id="publish-slug-preview">spense-tracker.morten-olsson.workers.dev/<span id="publish-slug-val">—</span></div>
     <div id="publish-result" class="modal-result hidden">
@@ -1014,6 +1020,7 @@ function doPublish(){
 
   if(!prospectName){el('publish-error').style.display='block';el('publish-error').textContent='Please enter a prospect name.';return}
   if(!slug){el('publish-error').style.display='block';el('publish-error').textContent='Could not generate a valid URL slug from that name.';return}
+  if(!repName){el('publish-error').style.display='block';el('publish-error').textContent='Please select your name.';return}
 
   el('publish-error').style.display='none'
   el('publish-submit-btn').disabled=true
