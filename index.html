@@ -975,6 +975,7 @@ function applyScenario(minutes,btn){
 
 <script>
 const PUBLISH_WORKER_URL = 'https://spense-publish.morten-olsson.workers.dev/publish'
+const PUBLISH_SECRET_TOKEN = '3e427c65debd3bb1824dfa987c76e3974eca2e7e0a27a319281b4ebc7323f9ed'
 
 function openPublishModal(){
   el('publish-modal').classList.remove('hidden')
@@ -1038,7 +1039,7 @@ function doPublish(){
   function sendToWorker(html){
     fetch(PUBLISH_WORKER_URL,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+PUBLISH_SECRET_TOKEN},
       body:JSON.stringify({html:html,prospectSlug:slug,publishedBy:repName||'Spense',prospectName:prospectName})
     })
     .then(function(r){return r.json()})
