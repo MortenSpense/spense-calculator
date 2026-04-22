@@ -230,10 +230,6 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 6V2h8v4M4 12H2V8h12v4h-2M4 9h8v5H4V9z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg>
         Export PDF
       </button>
-      <button class="save-btn" onclick="saveAssumptions()">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 2h8l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5"/><path d="M5 2v4h6V2M5 9h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Save assumptions
-      </button>
       <button class="save-btn publish-btn" onclick="openPublishModal()">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Publish for prospect
@@ -828,71 +824,6 @@ function onCurrencyChange(){
   update()
 }
 
-function saveAssumptions(){
-  // Save display-currency values — what the user sees — not internal EUR slider values.
-  // Money fields read from number inputs which hold exact user-typed values.
-  var nd={
-    currency:currency,
-    hiddenOn:hiddenOn,pspOn:pspOn,overlapOn:overlapOn,riskOn:riskOn,
-    view:currentView,
-    loc:v('loc'),grw:v('grw'),mpc:v('mpc'),mps:v('mps'),
-    obh:v('obh-n'),hcup:v('hcup'),psf:v('psf'),ovd:v('ovd'),
-    ppm:v('ppm'),csCpm:v('cs-cpm'),csMpc:v('cs-mpc'),csMps:v('cs-mps'),csRiy:v('cs-riy'),
-    txf:v('txf-n'),trmCnt:v('trm-cnt'),
-    // Money fields — read from number inputs (exact user value), not sliders (which snap to step)
-    hrc:  Math.round(parseFloat(el('hrc-n').value)  ||0),
-    apv:  Math.round(parseFloat(el('apv-n').value)  ||0),
-    lic:  Math.round(parseFloat(el('lic-n').value)  ||0),
-    trm:  Math.round(parseFloat(el('trm-n').value)  ||0),
-    ifl:  Math.round(parseFloat(el('ifl-n').value)  ||0),
-    ovt:  Math.round(parseFloat(el('ovt-n').value)  ||0),
-    ovp:  Math.round(parseFloat(el('ovp-n').value)  ||0),
-    csAcv:Math.round(parseFloat(el('cs-acv-n').value)||0),
-    csLic:Math.round(parseFloat(el('cs-lic-n').value)||0),
-    csFpc:Math.round(parseFloat(el('cs-fpc-n').value)||0),
-    csIfl:Math.round(parseFloat(el('cs-ifl-n').value)||0)
-  }
-
-  var newBlock='// @@DEFAULTS_START@@\nvar DEFAULTS='+JSON.stringify(nd,null,2)+';\n// @@DEFAULTS_END@@'
-
-  // Pricing field IDs to lock as readonly in the saved copy
-  var pricingIds=['lic-n','trm-n','trm-cnt','txf-n','ifl-n','obh-n','cs-lic-n','cs-fpc-n','cs-ifl-n']
-
-  function doDownload(sourceHtml){
-    var updated=sourceHtml.replace(/\/\/ @@DEFAULTS_START@@[\s\S]*?\/\/ @@DEFAULTS_END@@/,newBlock)
-    if(updated===sourceHtml){alert('Could not update defaults. Please report this bug.');return}
-    // Lock pricing fields as readonly in the saved copy
-    pricingIds.forEach(function(id){
-      var re=new RegExp('(id="'+id+'"[^>]*?)(>)','g')
-      updated=updated.replace(re,function(match,before,end){
-        if(before.indexOf('readonly')>-1) return match
-        return before+' readonly'+end
-      })
-    })
-    var blob=new Blob([updated],{type:'text/html'})
-    var url=URL.createObjectURL(blob)
-    var a=document.createElement('a')
-    a.href=url; a.download='spense-roi-calculator.html'
-    document.body.appendChild(a); a.click()
-    document.body.removeChild(a); URL.revokeObjectURL(url)
-  }
-
-  // When hosted (http/https), fetch the clean source directly — most reliable
-  if(window.location.protocol==='http:'||window.location.protocol==='https:'){
-    fetch(window.location.href)
-      .then(function(r){return r.text()})
-      .then(function(html){doDownload(html)})
-      .catch(function(){
-        // Fetch failed (e.g. cross-origin iframe) — fall back to captured source
-        if(_pageHTML) doDownload(_pageHTML)
-        else alert('Could not save assumptions. Try opening the calculator directly in a browser tab.')
-      })
-  } else {
-    // Local file:// — use the HTML captured at load time
-    if(_pageHTML) doDownload(_pageHTML)
-    else alert('Could not save assumptions.')
-  }
-}
 
 
 
@@ -1026,7 +957,7 @@ function doPublish(){
   el('publish-submit-btn').disabled=true
   el('publish-submit-btn').textContent='Publishing…'
 
-  // Build the personalised HTML — same as saveAssumptions but returns string instead of downloading
+  // Build the personalised HTML with current assumptions baked in as defaults
   var nd=buildDefaults()
   var newBlock='// @@DEFAULTS_START@@\nvar DEFAULTS='+JSON.stringify(nd,null,2)+';\n// @@DEFAULTS_END@@'
   var pricingIds=['lic-n','trm-n','trm-cnt','txf-n','ifl-n','obh-n','cs-lic-n','cs-fpc-n','cs-ifl-n']
