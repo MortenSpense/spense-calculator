@@ -63,22 +63,28 @@ The prospect opens the file in their browser and sees your numbers pre-loaded on
  
 ## Creating a per-prospect hosted URL
  
-Instead of sending an attachment, you can give each prospect their own permanent URL. This is more professional and avoids email attachment issues.
+Instead of sending an attachment, you can give each prospect their own permanent, trackable URL in under a minute — no GitHub required.
  
 **Workflow:**
-1. Configure the calculator for the prospect and click **Save assumptions**
-2. Rename the downloaded file to the prospect's name, e.g. `Hessel.html`
-3. Go to [github.com/MortenSpense/spense-calculator](https://github.com/MortenSpense/spense-calculator)
-4. Click **Add file → Upload files**, upload the renamed file, click **Commit changes**
-5. The prospect's URL is immediately live at:
+1. Configure the calculator for the prospect
+2. Click **Publish for prospect**
+3. Enter the prospect's name and select your name from the dropdown
+4. Click **Publish** — the calculator uploads automatically
+5. Copy the URL and send it to the prospect
+ 
+The prospect's URL looks like:
  
 ```
-https://mortenspense.github.io/spense-calculator/Hessel.html
+https://spense-tracker.morten-olsson.workers.dev/ejner-hessel-as
 ```
  
-The prospect opens it and lands directly on the correct view with your numbers pre-loaded.
+Every time the prospect opens their URL you receive a Slack notification showing their name, visit count, and timestamp. Visit counts are tracked automatically — no action needed on your end.
  
-> **Housekeeping:** Delete prospect files for closed or dead deals periodically to keep the repo tidy.
+In the published copy, **Spense pricing fields are locked as read-only**, exactly as with the Save assumptions download.
+ 
+> **Re-publishing:** Publishing the same prospect name a second time will prompt you to confirm before overwriting the existing URL. The URL itself stays the same, so any link you already sent the prospect continues to work — just with your updated numbers.
+ 
+> **Housekeeping:** Old prospect URLs can be removed from the management dashboard.
  
 ---
  
@@ -125,6 +131,7 @@ The live URL updates automatically within ~1 minute. No further action needed.
  
 | Version | Changes |
 |---------|---------|
+| v3.0 | Publish for prospect button — one-click hosted URLs via Cloudflare backend; authenticated publish endpoint (PUBLISH_SECRET); rep name dropdown (Lars, Didrik, Morten, Claus); 5MB payload guard |
 | v2.6 | Sliders removed for all monetary fields — number inputs only, eliminates all rounding/snap bugs; Spense pricing fields locked as read-only in saved prospect copies |
 | v2.5 | Active view saved with assumptions — prospect lands on correct tab automatically; slider snap bug fixed in Save assumptions (sliders now used as source of truth, not number inputs); locations slider extended to 50 |
 | v2.4 | Save assumptions button — downloads personalised copy with current values as defaults; uses fetch when hosted, falls back to captured HTML for local use |
