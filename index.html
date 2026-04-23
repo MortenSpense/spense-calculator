@@ -522,7 +522,7 @@ function fmt(eur,compact=false){
   if(compact){if(Math.abs(val)>=1e6)return sym+(val/1e6).toFixed(2)+'M';if(Math.abs(val)>=1000)return sym+Math.round(val/1000).toLocaleString()+'K'}
   return sym+val.toLocaleString()
 }
-function fmtM(m){return(!isFinite(m)||m<=0)?'—':Math.round(m)+' mo'}
+function fmtM(m){return(!isFinite(m)||m<=0)?'—':m<1?'< 1 mo':Math.round(m)+' mo'}
 
 function calcAS(){
   const ppm=v('ppm'),apv=vEur('apv-n'),loc=v('loc'),hrc=vEur('hrc-n'),grw=v('grw')/100
