@@ -75,7 +75,7 @@ Instead of sending an attachment, you can give each prospect their own permanent
 The prospect's URL looks like:
  
 ```
-https://spense-roi.morten-olsson.workers.dev/ejner-hessel-as
+https://spense-roi.results-calc.workers.dev/ejner-hessel-as
 ```
  
 Every time the prospect opens their URL you receive a Slack notification showing their name, visit count, and timestamp. Visit counts are tracked automatically — no action needed on your end.
