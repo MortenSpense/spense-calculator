@@ -913,6 +913,7 @@ function applyScenario(minutes,btn){
 <script>
 const PUBLISH_WORKER_URL = 'https://spense-publish.morten-olsson.workers.dev/publish'
 const PUBLISH_SECRET_TOKEN = '8df354884d0ada481e98b579efa74850af19038b3153420e429e6de44f4d2e9c'
+const REPS_URL = 'https://spense-dashboard.morten-olsson.workers.dev/api/reps'
 
 function openPublishModal(){
   el('publish-modal').classList.remove('hidden')
@@ -924,6 +925,17 @@ function openPublishModal(){
   el('publish-submit-btn').disabled=false
   el('publish-submit-btn').textContent='Publish'
   setTimeout(()=>el('publish-prospect').focus(),50)
+  fetch(REPS_URL).then(function(r){return r.json()}).then(function(reps){
+    if(!Array.isArray(reps)||reps.length===0) return
+    var sel=el('publish-rep')
+    sel.innerHTML='<option value="">Select your name…</option>'
+    reps.forEach(function(rep){
+      var o=document.createElement('option')
+      o.value=rep.name
+      o.textContent=rep.name
+      sel.appendChild(o)
+    })
+  }).catch(function(){})
 }
 
 function closePublishModal(){
