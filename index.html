@@ -290,7 +290,7 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
         <div class="row"><label>POS terminals per location</label><input type="range" id="trm-cnt" min="1" max="4" step="1" value="1" oninput="update()"><span class="val" id="trm-cnt-v">1</span></div>
         <div class="row editable"><label>Transaction fee (%)</label><input type="number" id="txf-n" class="num-input" value="0.05" step="0.01" oninput="update()"><span class="num-unit">%</span></div>
         <div class="row editable"><label>Impl. fee / location</label><input type="number" id="ifl-n" class="num-input" value="750" oninput="syncEurFromDisplay('ifl-n','ifl',true);update()"><span class="num-unit curr-sym">€</span></div>
-        <div class="row editable"><label>Total onboarding hours</label><input type="number" id="obh-n" class="num-input" value="20" oninput="update()"><span class="num-unit">hrs</span></div>
+        <div class="row editable"><label>Onboarding hours / location</label><input type="number" id="obh-n" class="num-input" value="3" oninput="update()"><span class="num-unit">hrs</span></div>
       </div>
       <div class="card">
         <div class="sec">Optional assumptions</div>
@@ -486,14 +486,15 @@ var _pageHTML=document.documentElement.outerHTML
 const RATES={EUR:1,NOK:11.65,DKK:7.46,CHF:0.96,GBP:0.86}
 const SYMS={EUR:'€',NOK:'kr',DKK:'kr',CHF:'CHF',GBP:'£'}
 // Denmark car sales: DKK 990/loc/mo = ~133 EUR; DKK 30/car = ~4 EUR
+// Denmark aftersales (validated): lic 2,500 DKK ≈ 335 EUR; trm 250 DKK ≈ 34 EUR; ifl 5,000 DKK ≈ 670 EUR; txf 0.5%; obh 3 hrs/loc
 const MARKETS={
-  norway:      {currency:'NOK',ppm:350,apv:2706,mpc:10,mps:3,hrc:40, grw:3,loc:5,csLic:85, csFpc:3},
-  denmark:     {currency:'DKK',ppm:229,apv:640, mpc:10,mps:3,hrc:38, grw:3,loc:5,csLic:133,csFpc:4},
-  benelux:     {currency:'EUR',ppm:350,apv:2700,mpc:10,mps:3,hrc:32, grw:3,loc:5,csLic:133,csFpc:4},
-  germany:     {currency:'EUR',ppm:340,apv:2800,mpc:10,mps:3,hrc:30, grw:3,loc:5,csLic:133,csFpc:4},
-  switzerland: {currency:'CHF',ppm:350,apv:2800,mpc:10,mps:3,hrc:55, grw:3,loc:5,csLic:133,csFpc:4},
-  italy:       {currency:'EUR',ppm:300,apv:2400,mpc:10,mps:3,hrc:24, grw:3,loc:5,csLic:133,csFpc:4},
-  uk:          {currency:'GBP',ppm:350,apv:2500,mpc:10,mps:3,hrc:28, grw:3,loc:5,csLic:133,csFpc:4},
+  norway:      {currency:'NOK',ppm:350,apv:2706,mpc:10,mps:3,hrc:40, grw:3,loc:5,csLic:85, csFpc:3,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
+  denmark:     {currency:'DKK',ppm:229,apv:640, mpc:10,mps:3,hrc:38, grw:3,loc:5,csLic:133,csFpc:4,lic:335,trm:34,txf:0.5, ifl:670,obh:3},
+  benelux:     {currency:'EUR',ppm:350,apv:2700,mpc:10,mps:3,hrc:32, grw:3,loc:5,csLic:133,csFpc:4,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
+  germany:     {currency:'EUR',ppm:340,apv:2800,mpc:10,mps:3,hrc:30, grw:3,loc:5,csLic:133,csFpc:4,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
+  switzerland: {currency:'CHF',ppm:350,apv:2800,mpc:10,mps:3,hrc:55, grw:3,loc:5,csLic:133,csFpc:4,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
+  italy:       {currency:'EUR',ppm:300,apv:2400,mpc:10,mps:3,hrc:24, grw:3,loc:5,csLic:133,csFpc:4,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
+  uk:          {currency:'GBP',ppm:350,apv:2500,mpc:10,mps:3,hrc:28, grw:3,loc:5,csLic:133,csFpc:4,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
 }
 
 let currency='EUR', hiddenOn=false, pspOn=false, overlapOn=false, riskOn=false, currentView='as'
@@ -503,7 +504,7 @@ var DEFAULTS={
   currency:'EUR',
   hiddenOn:false,pspOn:false,overlapOn:false,riskOn:false,
   view:'as',
-  loc:5,grw:3,mpc:10,mps:3,obh:20,hcup:35,psf:0.8,ovd:2,trmCnt:1,txf:0.05,
+  loc:5,grw:3,mpc:10,mps:3,obh:3,hcup:35,psf:0.8,ovd:2,trmCnt:1,txf:0.05,
   ppm:150,csCpm:70,csMpc:10,csMps:1,csRiy:2,
   // Money fields stored in display currency (EUR at default)
   hrc:40,apv:2706,lic:275,trm:50,ifl:750,ovt:150,ovp:100,
@@ -537,7 +538,7 @@ function calcAS(){
   const withSp=safe(admSp+annLic+annTxf+annPsp),curFull=safe(admCur+annPsp)
   const annSav=safe(curFull-withSp)
   const overlapT=overlapOn?safe((vEur('ovt-n')+vEur('ovp-n'))*v('ovd')*loc):0
-  const intCost=safe(obh*hrc),swCost=safe(ifl*loc),implCost=safe(swCost+intCost+overlapT)
+  const intCost=safe(obh*loc*hrc),swCost=safe(ifl*loc),implCost=safe(swCost+intCost+overlapT)
   const payback=annSav>0?safe(implCost/(annSav/12)):Infinity
   const hrsSaved=safe(hrsCur-hrsSp),fte=safe(hrsSaved/1600)
   const tPay=tPpm*12,cppB=tPay>0?safe(curFull/tPay):0,cppA=tPay>0?safe(withSp/tPay):0
@@ -805,6 +806,11 @@ function applyMarket(key,btn){
   sv('grw',m.grw); sv('loc',m.loc)
   sv('hrc-n',   Math.round(m.hrc*rate))
   sv('apv-n',   Math.round(m.apv*rate))
+  sv('lic-n',   Math.round(m.lic*rate))
+  sv('trm-n',   Math.round(m.trm*rate))
+  sv('txf-n',   m.txf)
+  sv('ifl-n',   Math.round(m.ifl*rate))
+  sv('obh-n',   m.obh)
   sv('cs-lic-n', Math.round(m.csLic*rate))
   sv('cs-fpc-n', Math.round(m.csFpc*rate))
   update()
