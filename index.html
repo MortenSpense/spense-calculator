@@ -485,16 +485,23 @@ var _pageHTML=document.documentElement.outerHTML
 // Exchange rates are assumptions — update as needed. 1 EUR = X [currency]
 const RATES={EUR:1,NOK:11.65,DKK:7.46,CHF:0.96,GBP:0.86}
 const SYMS={EUR:'€',NOK:'kr',DKK:'kr',CHF:'CHF',GBP:'£'}
-// Denmark car sales: DKK 990/loc/mo = ~133 EUR; DKK 30/car = ~4 EUR
-// Denmark aftersales (validated): lic 2,500 DKK ≈ 335 EUR; trm 250 DKK ≈ 34 EUR; ifl 5,000 DKK ≈ 670 EUR; txf 0.5%; obh 3 hrs/loc
+// Spense pricing per market (validated 2026-04-29). Stored as EUR equivalents — display
+// converts via RATES[currency]. The pivot model is scheduled for replacement; see todo
+// "Native-Currency Presets + Pricing Correction".
+//   Aftersales lic / loc / mo  — DK 2,500 / NO 3,500 / EUR 335 / CH 310 / UK 290
+//   Car sales lic / loc / mo   — DK 990   / NO 1,500 / EUR 135 / CH 125 / UK 115
+//   Aftersales transaction fee — DK 0.05% / others 0.20%
+//   Car sales fee per car      — DK 30    / NO 50    / EUR 4   / CH 4   / UK 4
+//   Terminal integration / mo  — DK 250   / NO 250   / EUR 30  / CH 28  / UK 30
+//   Onboarding / loc (one-time)— DK 5,000 / NO 5,000 / EUR 670 / CH 625 / UK 670
 const MARKETS={
-  norway:      {currency:'NOK',ppm:350,apv:2706,mpc:10,mps:3,hrc:40, grw:3,loc:5,csLic:85, csFpc:3,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
-  denmark:     {currency:'DKK',ppm:229,apv:640, mpc:10,mps:3,hrc:38, grw:3,loc:5,csLic:133,csFpc:4,lic:335,trm:34,txf:0.5, ifl:670,obh:3},
-  benelux:     {currency:'EUR',ppm:350,apv:2700,mpc:10,mps:3,hrc:32, grw:3,loc:5,csLic:133,csFpc:4,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
-  germany:     {currency:'EUR',ppm:340,apv:2800,mpc:10,mps:3,hrc:30, grw:3,loc:5,csLic:133,csFpc:4,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
-  switzerland: {currency:'CHF',ppm:350,apv:2800,mpc:10,mps:3,hrc:55, grw:3,loc:5,csLic:133,csFpc:4,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
-  italy:       {currency:'EUR',ppm:300,apv:2400,mpc:10,mps:3,hrc:24, grw:3,loc:5,csLic:133,csFpc:4,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
-  uk:          {currency:'GBP',ppm:350,apv:2500,mpc:10,mps:3,hrc:28, grw:3,loc:5,csLic:133,csFpc:4,lic:275,trm:50,txf:0.05,ifl:750,obh:3},
+  norway:      {currency:'NOK',ppm:350,apv:2706,mpc:10,mps:3,hrc:40, grw:3,loc:5,csLic:128.76,csFpc:4.29,lic:300.43,trm:21.46,txf:0.2, ifl:429.18,obh:3},
+  denmark:     {currency:'DKK',ppm:229,apv:640, mpc:10,mps:3,hrc:38, grw:3,loc:5,csLic:132.71,csFpc:4.02,lic:335.12,trm:33.51,txf:0.05,ifl:670.24,obh:3},
+  benelux:     {currency:'EUR',ppm:350,apv:2700,mpc:10,mps:3,hrc:32, grw:3,loc:5,csLic:135,   csFpc:4,   lic:335,   trm:30,   txf:0.2, ifl:670,   obh:3},
+  germany:     {currency:'EUR',ppm:340,apv:2800,mpc:10,mps:3,hrc:30, grw:3,loc:5,csLic:135,   csFpc:4,   lic:335,   trm:30,   txf:0.2, ifl:670,   obh:3},
+  switzerland: {currency:'CHF',ppm:350,apv:2800,mpc:10,mps:3,hrc:55, grw:3,loc:5,csLic:130.21,csFpc:4.17,lic:322.92,trm:29.17,txf:0.2, ifl:651.04,obh:3},
+  italy:       {currency:'EUR',ppm:300,apv:2400,mpc:10,mps:3,hrc:24, grw:3,loc:5,csLic:135,   csFpc:4,   lic:335,   trm:30,   txf:0.2, ifl:670,   obh:3},
+  uk:          {currency:'GBP',ppm:350,apv:2500,mpc:10,mps:3,hrc:28, grw:3,loc:5,csLic:133.72,csFpc:4.65,lic:337.21,trm:34.88,txf:0.2, ifl:779.07,obh:3},
 }
 
 let currency='EUR', hiddenOn=false, pspOn=false, overlapOn=false, riskOn=false, currentView='as'
@@ -504,11 +511,11 @@ var DEFAULTS={
   currency:'EUR',
   hiddenOn:false,pspOn:false,overlapOn:false,riskOn:false,
   view:'as',
-  loc:5,grw:3,mpc:10,mps:3,obh:3,hcup:35,psf:0.8,ovd:2,trmCnt:1,txf:0.05,
+  loc:5,grw:3,mpc:10,mps:3,obh:3,hcup:35,psf:0.8,ovd:2,trmCnt:1,txf:0.2,
   ppm:150,csCpm:70,csMpc:10,csMps:1,csRiy:2,
   // Money fields stored in display currency (EUR at default)
-  hrc:40,apv:2706,lic:275,trm:50,ifl:750,ovt:150,ovp:100,
-  csAcv:250000,csLic:133,csFpc:4,csIfl:500
+  hrc:40,apv:2706,lic:335,trm:30,ifl:670,ovt:150,ovp:100,
+  csAcv:250000,csLic:135,csFpc:4,csIfl:500
 }
 // @@DEFAULTS_END@@
 
