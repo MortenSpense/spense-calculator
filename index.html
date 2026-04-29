@@ -254,6 +254,7 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
       <div class="markets">
         <button class="market-btn" onclick="applyMarket('norway',this)"><span class="flag">NO</span>Norway</button>
         <button class="market-btn" onclick="applyMarket('denmark',this)"><span class="flag">DK</span>Denmark</button>
+        <button class="market-btn" onclick="applyMarket('sweden',this)"><span class="flag">SE</span>Sweden</button>
         <button class="market-btn" onclick="applyMarket('benelux',this)"><span class="flag">BE</span>Benelux</button>
         <button class="market-btn" onclick="applyMarket('germany',this)"><span class="flag">DE</span>Germany</button>
         <button class="market-btn" onclick="applyMarket('switzerland',this)"><span class="flag">CH</span>Switzerland</button>
@@ -483,21 +484,23 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
 var _ownSource=document.currentScript.textContent
 var _pageHTML=document.documentElement.outerHTML
 // Exchange rates are assumptions — update as needed. 1 EUR = X [currency]
-const RATES={EUR:1,NOK:11.65,DKK:7.46,CHF:0.96,GBP:0.86}
-const SYMS={EUR:'€',NOK:'kr',DKK:'kr',CHF:'CHF',GBP:'£'}
+const RATES={EUR:1,NOK:11.65,DKK:7.46,SEK:10.93,CHF:0.96,GBP:0.86}
+const SYMS={EUR:'€',NOK:'kr',DKK:'kr',SEK:'kr',CHF:'CHF',GBP:'£'}
 // Spense pricing per market (validated 2026-04-29). Stored as EUR equivalents — display
 // converts via RATES[currency]. The pivot model is scheduled for replacement; see todo
 // "Native-Currency Presets + Pricing Correction".
-//   Aftersales lic / loc / mo  — DK 2,500 / NO 3,500 / EUR 335 / CH 310 / UK 290
-//   Car sales lic / loc / mo   — DK 990   / NO 1,500 / EUR 135 / CH 125 / UK 115
-//   Aftersales transaction fee — DK 0.05% / others 0.20%
-//   Car sales fee per car      — DK 30    / NO 50    / EUR 4   / CH 4   / UK 4
-//   Terminal integration / mo  — DK 250   / NO 250   / EUR 30  / CH 28  / UK 30
-//   Onboarding / loc (one-time)— DK 5,000 / NO 5,000 / EUR 670 / CH 625 / UK 670
+//   Aftersales lic / loc / mo  — DK 2,500 / SE 3,650 / NO 3,500 / EUR 335 / CH 310 / UK 290
+//   Car sales lic / loc / mo   — DK 990   / SE 1,450 / NO 1,500 / EUR 135 / CH 125 / UK 115
+//   Aftersales transaction fee — DK 0.05% / SE 0.10% / others 0.20%
+//   Car sales fee per car      — DK 30    / SE 45    / NO 50    / EUR 4   / CH 4   / UK 4
+//   Terminal integration / mo  — DK 250   / SE 365   / NO 250   / EUR 30  / CH 28  / UK 30
+//   Onboarding / loc (one-time)— DK 5,000 / SE 7,300 / NO 5,000 / EUR 670 / CH 625 / UK 670
+// SE industry assumptions (ppm, apv, hrc) mirror Denmark pending Claus's review post 2026-05-04.
 const MARKETS={
-  norway:      {currency:'NOK',ppm:350,apv:2706,mpc:10,mps:3,hrc:40, grw:3,loc:5,csLic:128.76,csFpc:4.29,lic:300.43,trm:21.46,txf:0.2, ifl:429.18,obh:3},
-  denmark:     {currency:'DKK',ppm:229,apv:640, mpc:10,mps:3,hrc:38, grw:3,loc:5,csLic:132.71,csFpc:4.02,lic:335.12,trm:33.51,txf:0.05,ifl:670.24,obh:3},
-  benelux:     {currency:'EUR',ppm:350,apv:2700,mpc:10,mps:3,hrc:32, grw:3,loc:5,csLic:135,   csFpc:4,   lic:335,   trm:30,   txf:0.2, ifl:670,   obh:3},
+  norway:      {currency:'NOK',ppm:350,apv:2706,mpc:10,mps:3,hrc:40, grw:3,loc:5,csLic:128.76, csFpc:4.29,  lic:300.43, trm:21.46,  txf:0.2, ifl:429.18, obh:3},
+  denmark:     {currency:'DKK',ppm:229,apv:640, mpc:10,mps:3,hrc:38, grw:3,loc:5,csLic:132.71, csFpc:4.02,  lic:335.12, trm:33.51,  txf:0.05,ifl:670.24, obh:3},
+  sweden:      {currency:'SEK',ppm:229,apv:640, mpc:10,mps:3,hrc:38, grw:3,loc:5,csLic:132.6624,csFpc:4.1171,lic:333.9432,trm:33.3943,txf:0.1, ifl:667.8866,obh:3},
+  benelux:     {currency:'EUR',ppm:350,apv:2700,mpc:10,mps:3,hrc:32, grw:3,loc:5,csLic:135,    csFpc:4,     lic:335,    trm:30,     txf:0.2, ifl:670,    obh:3},
   germany:     {currency:'EUR',ppm:340,apv:2800,mpc:10,mps:3,hrc:30, grw:3,loc:5,csLic:135,   csFpc:4,   lic:335,   trm:30,   txf:0.2, ifl:670,   obh:3},
   switzerland: {currency:'CHF',ppm:350,apv:2800,mpc:10,mps:3,hrc:55, grw:3,loc:5,csLic:130.21,csFpc:4.17,lic:322.92,trm:29.17,txf:0.2, ifl:651.04,obh:3},
   italy:       {currency:'EUR',ppm:300,apv:2400,mpc:10,mps:3,hrc:24, grw:3,loc:5,csLic:135,   csFpc:4,   lic:335,   trm:30,   txf:0.2, ifl:670,   obh:3},
