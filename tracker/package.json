@@ -1,0 +1,17 @@
+{
+  "name": "spense-roi",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240924.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.1",
+    "@cloudflare/vitest-pool-workers": "^0.5.7",
+    "wrangler": "^4.0.0"
+  }
+}

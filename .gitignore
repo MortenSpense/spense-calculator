@@ -1,0 +1,26 @@
+# Worker build artifacts
+node_modules/
+.wrangler/
+dist/
+
+# Local env / secrets
+.dev.vars
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+
+# Clairvoyance app session/UI state (machine-local, not source-of-truth)
+.Clairvoyance/workspace-session.json
+.Clairvoyance/editor-session.json
+.Clairvoyance/ui-state.json
+.Clairvoyance/constellation.json
+.Clairvoyance/staff-names.json
+.Clairvoyance/home

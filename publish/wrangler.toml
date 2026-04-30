@@ -1,0 +1,8 @@
+name = "spense-publish"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+account_id = "dc361af4342ed66e4fca1631388936e0"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "spense-calculator"
