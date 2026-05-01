@@ -1,0 +1,14 @@
+name = "spense-hubspot"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+account_id = "dc361af4342ed66e4fca1631388936e0"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "spense-calculator"
+
+# Secrets — set via wrangler secret put, never committed:
+#   HUBSPOT_WEBHOOK_SECRET — bearer token shared with HubSpot Workflow webhook
+#   HUBSPOT_API_TOKEN      — Private App token, scopes: crm.objects.contacts.read|write
+#   SLACK_WEBHOOK_URL      — Slack incoming webhook (same as tracker worker, or a dedicated channel)
+#   WORKER_SECRET          — random string used to make slug generation unguessable
