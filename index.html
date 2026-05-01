@@ -158,7 +158,7 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
   body{background:#fff!important;font-size:10px;font-family:'Open Sans',sans-serif}
   header,footer,.export-btn,.save-btn,.header-stats,.view-tabs,
   .presets,.markets,select,
-  .toggle-row,#hidden-rows,#psp-rows,#overlap-rows,#risk-rows,
+  .toggle-row,#hidden-rows,#psp-rows,#sms-rows,#overlap-rows,#risk-rows,
   .badges,.charts-2col,.left{display:none!important}
   .main{display:block!important;padding:0!important;max-width:100%!important}
   #right{display:block;width:100%}
@@ -241,32 +241,25 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
 <div class="main">
   <div class="left">
 
-    <!-- Shared: market, currency, locations, hourly cost, growth -->
+    <!-- Shared: market, locations, hourly cost, growth -->
     <div class="card">
-      <div class="sec">Market &amp; currency</div>
-      <select id="currency" onchange="onCurrencyChange()">
-        <option value="EUR">EUR — Euro</option>
-        <option value="NOK">NOK — Norwegian Krone</option>
-        <option value="DKK">DKK — Danish Krone</option>
-        <option value="CHF">CHF — Swiss Franc</option>
-        <option value="GBP">GBP — British Pound</option>
-      </select>
+      <div class="sec">Market preset</div>
       <div class="markets">
-        <button class="market-btn" onclick="applyMarket('norway',this)"><span class="flag">NO</span>Norway</button>
-        <button class="market-btn" onclick="applyMarket('denmark',this)"><span class="flag">DK</span>Denmark</button>
-        <button class="market-btn" onclick="applyMarket('sweden',this)"><span class="flag">SE</span>Sweden</button>
-        <button class="market-btn" onclick="applyMarket('benelux',this)"><span class="flag">BE</span>Benelux</button>
-        <button class="market-btn" onclick="applyMarket('germany',this)"><span class="flag">DE</span>Germany</button>
-        <button class="market-btn" onclick="applyMarket('switzerland',this)"><span class="flag">CH</span>Switzerland</button>
-        <button class="market-btn" onclick="applyMarket('italy',this)"><span class="flag">IT</span>Italy</button>
-        <button class="market-btn" onclick="applyMarket('uk',this)"><span class="flag">UK</span>UK</button>
+        <button class="market-btn" data-market="norway" onclick="applyMarket('norway',this)"><span class="flag">NO</span>Norway</button>
+        <button class="market-btn" data-market="denmark" onclick="applyMarket('denmark',this)"><span class="flag">DK</span>Denmark</button>
+        <button class="market-btn" data-market="sweden" onclick="applyMarket('sweden',this)"><span class="flag">SE</span>Sweden</button>
+        <button class="market-btn" data-market="benelux" onclick="applyMarket('benelux',this)"><span class="flag">BE</span>Benelux</button>
+        <button class="market-btn" data-market="germany" onclick="applyMarket('germany',this)"><span class="flag">DE</span>Germany</button>
+        <button class="market-btn" data-market="switzerland" onclick="applyMarket('switzerland',this)"><span class="flag">CH</span>Switzerland</button>
+        <button class="market-btn" data-market="italy" onclick="applyMarket('italy',this)"><span class="flag">IT</span>Italy</button>
+        <button class="market-btn" data-market="uk" onclick="applyMarket('uk',this)"><span class="flag">UK</span>UK</button>
       </div>
     </div>
 
     <div class="card">
       <div class="sec">Dealership profile (shared)</div>
       <div class="row"><label>Number of locations</label><input type="range" id="loc" min="1" max="50" step="1" value="5" oninput="update()"><span class="val" id="loc-v">5</span></div>
-      <div class="row editable"><label>Admin cost (per hr)</label><input type="number" id="hrc-n" class="num-input" value="40" oninput="syncEurFromDisplay('hrc-n','hrc',true);update()"><span class="num-unit curr-sym">€</span></div>
+      <div class="row editable"><label>Admin cost (per hr)</label><input type="number" id="hrc-n" class="num-input" value="40" oninput="update()"><span class="num-unit curr-sym">€</span></div>
       <div class="row"><label>Annual growth rate</label><input type="range" id="grw" min="0" max="15" step="1" value="3" oninput="update()"><span class="val" id="grw-v">3%</span></div>
     </div>
 
@@ -280,17 +273,17 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
           <button class="preset-btn" onclick="applyScenario(15,this)">Complex<small>15 min</small></button>
         </div>
         <div class="row"><label>Payments / month (per location)</label><input type="range" id="ppm" min="50" max="1000" step="5" value="150" oninput="update()"><span class="val" id="ppm-v">150</span></div>
-        <div class="row editable"><label>Avg payment value</label><input type="number" id="apv-n" class="num-input" value="2706" oninput="syncEurFromDisplay('apv-n','apv',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Avg payment value</label><input type="number" id="apv-n" class="num-input" value="2706" oninput="update()"><span class="num-unit curr-sym">€</span></div>
         <div class="row"><label>Admin min / payment (now)</label><input type="range" id="mpc" min="3" max="30" step="1" value="10" oninput="update()"><span class="val" id="mpc-v">10 min</span></div>
         <div class="row"><label>Admin min / payment (Spense)</label><input type="range" id="mps" min="1" max="10" step="1" value="3" oninput="update()"><span class="val" id="mps-v">3 min</span></div>
       </div>
       <div class="card">
         <div class="sec">Aftersales — Spense pricing</div>
-        <div class="row editable"><label>Monthly license / location</label><input type="number" id="lic-n" class="num-input" value="275" oninput="syncEurFromDisplay('lic-n','lic',true);update()"><span class="num-unit curr-sym">€</span></div>
-        <div class="row editable"><label>Terminal integration / mo (per terminal)</label><input type="number" id="trm-n" class="num-input" value="50" oninput="syncEurFromDisplay('trm-n','trm',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Monthly license / location</label><input type="number" id="lic-n" class="num-input" value="335" oninput="update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Terminal integration / mo (per terminal)</label><input type="number" id="trm-n" class="num-input" value="30" oninput="update()"><span class="num-unit curr-sym">€</span></div>
         <div class="row"><label>POS terminals per location</label><input type="range" id="trm-cnt" min="1" max="4" step="1" value="1" oninput="update()"><span class="val" id="trm-cnt-v">1</span></div>
         <div class="row editable"><label>Transaction fee (%)</label><input type="number" id="txf-n" class="num-input" value="0.05" step="0.01" oninput="update()"><span class="num-unit">%</span></div>
-        <div class="row editable"><label>Impl. fee / location</label><input type="number" id="ifl-n" class="num-input" value="750" oninput="syncEurFromDisplay('ifl-n','ifl',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Impl. fee / location</label><input type="number" id="ifl-n" class="num-input" value="670" oninput="update()"><span class="num-unit curr-sym">€</span></div>
         <div class="row editable"><label>Onboarding hours / location</label><input type="number" id="obh-n" class="num-input" value="3" oninput="update()"><span class="num-unit">hrs</span></div>
       </div>
       <div class="card">
@@ -309,6 +302,17 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
         <div id="psp-rows" class="hidden" style="margin-bottom:7px">
           <div class="row" style="margin-top:6px"><label>PSP fee (%)</label><input type="range" id="psf" min="0.1" max="3" step="0.1" value="0.8" oninput="update()"><span class="val" id="psf-v">0.8%</span></div>
         </div>
+        <div class="toggle-row" onclick="toggleSms()">
+          <div class="toggle-track on" id="t-sms"><div class="toggle-thumb"></div></div>
+          <div><div class="toggle-label">Include SMS notifications</div><div class="toggle-desc">Adds market-based SMS cost using a per-payment assumption</div></div>
+        </div>
+        <div id="sms-rows" style="margin-bottom:7px">
+          <div class="row editable" style="margin-top:6px"><label>SMS sent per payment</label><input type="number" id="sms-per-payment-n" class="num-input" value="1" min="0" step="0.1" oninput="update()"><span class="num-unit">×</span></div>
+        </div>
+        <div class="toggle-row" onclick="togglePersonalisedUrl()">
+          <div class="toggle-track on" id="t-url"><div class="toggle-thumb"></div></div>
+          <div><div class="toggle-label">Include personalised URL fee</div><div class="toggle-desc">Adds the market-specific URL fee per location per month</div></div>
+        </div>
         <div class="sec">Transition / overlap costs</div>
         <div class="toggle-row" onclick="toggleOverlap()">
           <div class="toggle-track" id="t-overlap"><div class="toggle-thumb"></div></div>
@@ -316,8 +320,8 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
         </div>
         <div id="overlap-rows" class="hidden" style="margin-top:6px">
           <div class="row"><label>Overlap duration (months)</label><input type="range" id="ovd" min="1" max="36" step="1" value="2" oninput="update()"><span class="val" id="ovd-v">2 mo</span></div>
-          <div class="row editable"><label>Legacy terminal / loc / mo</label><input type="number" id="ovt-n" class="num-input" value="150" oninput="syncEurFromDisplay('ovt-n','ovt',true);update()"><span class="num-unit curr-sym">€</span></div>
-          <div class="row editable"><label>Legacy PSP / loc / mo</label><input type="number" id="ovp-n" class="num-input" value="100" oninput="syncEurFromDisplay('ovp-n','ovp',true);update()"><span class="num-unit curr-sym">€</span></div>
+          <div class="row editable"><label>Legacy terminal / loc / mo</label><input type="number" id="ovt-n" class="num-input" value="150" oninput="update()"><span class="num-unit curr-sym">€</span></div>
+          <div class="row editable"><label>Legacy PSP / loc / mo</label><input type="number" id="ovp-n" class="num-input" value="100" oninput="update()"><span class="num-unit curr-sym">€</span></div>
         </div>
       </div>
     </div>
@@ -327,16 +331,16 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
       <div class="card">
         <div class="sec">Car sales — volume</div>
         <div class="row"><label>Cars sold / month (per location)</label><input type="range" id="cs-cpm" min="5" max="200" step="5" value="70" oninput="update()"><span class="val" id="cs-cpm-v">70</span></div>
-        <div class="row editable"><label>Avg car value</label><input type="number" id="cs-acv-n" class="num-input" value="250000" oninput="syncEurFromDisplay('cs-acv-n','cs-acv',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Avg car value</label><input type="number" id="cs-acv-n" class="num-input" value="250000" oninput="update()"><span class="num-unit curr-sym">€</span></div>
         <div class="sec">Admin time per transaction</div>
         <div class="row"><label>Minutes wasted per car (now)</label><input type="range" id="cs-mpc" min="2" max="30" step="1" value="10" oninput="update()"><span class="val" id="cs-mpc-v">10 min</span></div>
         <div class="row"><label>Minutes per car (Spense)</label><input type="range" id="cs-mps" min="1" max="10" step="1" value="1" oninput="update()"><span class="val" id="cs-mps-v">1 min</span></div>
       </div>
       <div class="card">
         <div class="sec">Car sales — Spense pricing</div>
-        <div class="row editable"><label>Monthly license / location</label><input type="number" id="cs-lic-n" class="num-input" value="133" oninput="syncEurFromDisplay('cs-lic-n','cs-lic',true);update()"><span class="num-unit curr-sym">€</span></div>
-        <div class="row editable"><label>Fee per car sold</label><input type="number" id="cs-fpc-n" class="num-input" value="4" oninput="syncEurFromDisplay('cs-fpc-n','cs-fpc',true);update()"><span class="num-unit curr-sym">€</span></div>
-        <div class="row editable"><label>Impl. fee / location</label><input type="number" id="cs-ifl-n" class="num-input" value="500" oninput="syncEurFromDisplay('cs-ifl-n','cs-ifl',true);update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Monthly license / location</label><input type="number" id="cs-lic-n" class="num-input" value="135" oninput="update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Fee per car sold</label><input type="number" id="cs-fpc-n" class="num-input" value="4" oninput="update()"><span class="num-unit curr-sym">€</span></div>
+        <div class="row editable"><label>Impl. fee / location</label><input type="number" id="cs-ifl-n" class="num-input" value="670" oninput="update()"><span class="num-unit curr-sym">€</span></div>
       </div>
       <div class="card">
         <div class="sec">Key handover risk (optional)</div>
@@ -466,7 +470,7 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
     </div>
 
     <div class="print-footer" style="display:none">
-      <div class="print-disclaimer-text">All figures are estimates based on inputs provided. Exchange rates are assumptions and do not reflect live market data. Results are for indicative purposes only.</div>
+      <div class="print-disclaimer-text">All figures are estimates based on inputs provided. Results are for indicative purposes only.</div>
       <div class="print-footer-logo">
         <svg class="print-footer-logo-icon" viewBox="0 0 32 32" fill="none"><rect x="2" y="14" width="10" height="10" rx="2" fill="#3d60f5"/><rect x="14" y="2" width="10" height="10" rx="2" fill="#3d60f5" opacity=".6"/><rect x="14" y="14" width="10" height="10" rx="2" fill="#3d60f5"/><rect x="2" y="2" width="10" height="10" rx="2" fill="#3d60f5" opacity=".3"/></svg>
         spense
@@ -476,78 +480,73 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
 </div>
 
 <footer>
-  <p style="font-size:11px;color:var(--text3);font-family:var(--body)">All figures are estimates based on inputs provided. Exchange rates are assumptions and do not reflect live market data. Results are for indicative purposes only.</p>
+  <p style="font-size:11px;color:var(--text3);font-family:var(--body)">All figures are estimates based on inputs provided. Results are for indicative purposes only.</p>
 </footer>
 
 <script>
 // Capture own source and full page HTML immediately at parse time — before any DOM mutations
 var _ownSource=document.currentScript.textContent
 var _pageHTML=document.documentElement.outerHTML
-// Exchange rates are assumptions — update as needed. 1 EUR = X [currency]
-const RATES={EUR:1,NOK:11.65,DKK:7.46,SEK:10.93,CHF:0.96,GBP:0.86}
 const SYMS={EUR:'€',NOK:'kr',DKK:'kr',SEK:'kr',CHF:'CHF',GBP:'£'}
-// Spense pricing per market (validated 2026-04-29). Stored as EUR equivalents — display
-// converts via RATES[currency]. The pivot model is scheduled for replacement; see todo
-// "Native-Currency Presets + Pricing Correction".
-//   Aftersales lic / loc / mo  — DK 2,500 / SE 3,650 / NO 3,500 / EUR 335 / CH 310 / UK 290
-//   Car sales lic / loc / mo   — DK 990   / SE 1,450 / NO 1,500 / EUR 135 / CH 125 / UK 115
-//   Aftersales transaction fee — DK 0.05% / SE 0.10% / others 0.20%
-//   Car sales fee per car      — DK 30    / SE 45    / NO 50    / EUR 4   / CH 4   / UK 4
-//   Terminal integration / mo  — DK 250   / SE 365   / NO 250   / EUR 30  / CH 28  / UK 30
-//   Onboarding / loc (one-time)— DK 5,000 / SE 7,300 / NO 5,000 / EUR 670 / CH 625 / UK 670
+// Native-currency market presets validated 2026-04-29 with Sweden added the same day.
 // SE industry assumptions (ppm, apv, hrc) mirror Denmark pending Claus's review post 2026-05-04.
 const MARKETS={
-  norway:      {currency:'NOK',ppm:350,apv:2706,mpc:10,mps:3,hrc:40, grw:3,loc:5,csLic:128.76, csFpc:4.29,  lic:300.43, trm:21.46,  txf:0.2, ifl:429.18, obh:3},
-  denmark:     {currency:'DKK',ppm:229,apv:640, mpc:10,mps:3,hrc:38, grw:3,loc:5,csLic:132.71, csFpc:4.02,  lic:335.12, trm:33.51,  txf:0.05,ifl:670.24, obh:3},
-  sweden:      {currency:'SEK',ppm:229,apv:640, mpc:10,mps:3,hrc:38, grw:3,loc:5,csLic:132.6624,csFpc:4.1171,lic:333.9432,trm:33.3943,txf:0.1, ifl:667.8866,obh:3},
-  benelux:     {currency:'EUR',ppm:350,apv:2700,mpc:10,mps:3,hrc:32, grw:3,loc:5,csLic:135,    csFpc:4,     lic:335,    trm:30,     txf:0.2, ifl:670,    obh:3},
-  germany:     {currency:'EUR',ppm:340,apv:2800,mpc:10,mps:3,hrc:30, grw:3,loc:5,csLic:135,   csFpc:4,   lic:335,   trm:30,   txf:0.2, ifl:670,   obh:3},
-  switzerland: {currency:'CHF',ppm:350,apv:2800,mpc:10,mps:3,hrc:55, grw:3,loc:5,csLic:130.21,csFpc:4.17,lic:322.92,trm:29.17,txf:0.2, ifl:651.04,obh:3},
-  italy:       {currency:'EUR',ppm:300,apv:2400,mpc:10,mps:3,hrc:24, grw:3,loc:5,csLic:135,   csFpc:4,   lic:335,   trm:30,   txf:0.2, ifl:670,   obh:3},
-  uk:          {currency:'GBP',ppm:350,apv:2500,mpc:10,mps:3,hrc:28, grw:3,loc:5,csLic:133.72,csFpc:4.65,lic:337.21,trm:34.88,txf:0.2, ifl:779.07,obh:3},
+  norway:      {currency:'NOK',ppm:350,apv:2706,mpc:10,mps:3,hrc:40,grw:3,loc:5,lic:3500,trm:250,txf:0.2,ifl:5000,obh:3,csLic:1500,csFpc:50,csIfl:5000,smsFee:1.0,urlFee:190},
+  denmark:     {currency:'DKK',ppm:229,apv:640,mpc:10,mps:3,hrc:38,grw:3,loc:5,lic:2500,trm:250,txf:0.05,ifl:5000,obh:3,csLic:990,csFpc:30,csIfl:5000,smsFee:0.5,urlFee:125},
+  sweden:      {currency:'SEK',ppm:229,apv:640,mpc:10,mps:3,hrc:38,grw:3,loc:5,lic:3650,trm:365,txf:0.1,ifl:7300,obh:3,csLic:1450,csFpc:45,csIfl:7300,smsFee:0.75,urlFee:185},
+  benelux:     {currency:'EUR',ppm:350,apv:2700,mpc:10,mps:3,hrc:32,grw:3,loc:5,lic:335,trm:30,txf:0.2,ifl:670,obh:3,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
+  germany:     {currency:'EUR',ppm:340,apv:2800,mpc:10,mps:3,hrc:30,grw:3,loc:5,lic:335,trm:30,txf:0.2,ifl:670,obh:3,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
+  switzerland: {currency:'CHF',ppm:350,apv:2800,mpc:10,mps:3,hrc:55,grw:3,loc:5,lic:310,trm:28,txf:0.2,ifl:625,obh:3,csLic:125,csFpc:4,csIfl:625,smsFee:0.1,urlFee:14},
+  italy:       {currency:'EUR',ppm:300,apv:2400,mpc:10,mps:3,hrc:24,grw:3,loc:5,lic:335,trm:30,txf:0.2,ifl:670,obh:3,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
+  uk:          {currency:'GBP',ppm:350,apv:2500,mpc:10,mps:3,hrc:28,grw:3,loc:5,lic:290,trm:30,txf:0.2,ifl:670,obh:3,csLic:115,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
 }
 
-let currency='EUR', hiddenOn=false, pspOn=false, overlapOn=false, riskOn=false, currentView='as'
+let currency='EUR', hiddenOn=false, pspOn=false, smsOn=true, urlOn=true, overlapOn=false, riskOn=false, currentView='as', currentMarket=''
 
 // @@DEFAULTS_START@@
 var DEFAULTS={
+  market:'',
   currency:'EUR',
-  hiddenOn:false,pspOn:false,overlapOn:false,riskOn:false,
+  hiddenOn:false,pspOn:false,smsOn:true,urlOn:true,overlapOn:false,riskOn:false,
   view:'as',
-  loc:5,grw:3,mpc:10,mps:3,obh:3,hcup:35,psf:0.8,ovd:2,trmCnt:1,txf:0.2,
+  loc:5,grw:3,mpc:10,mps:3,obh:3,hcup:35,psf:0.8,smsPerPayment:1,ovd:2,trmCnt:1,txf:0.2,
   ppm:150,csCpm:70,csMpc:10,csMps:1,csRiy:2,
-  // Money fields stored in display currency (EUR at default)
   hrc:40,apv:2706,lic:335,trm:30,ifl:670,ovt:150,ovp:100,
-  csAcv:250000,csLic:135,csFpc:4,csIfl:500
+  csAcv:250000,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15
 }
 // @@DEFAULTS_END@@
 
 function v(id){return parseFloat(document.getElementById(id).value)||0}
-function vEur(numId){return (parseFloat(document.getElementById(numId).value)||0)/RATES[currency]}
 function sv(id,val){var e=document.getElementById(id);if(e)e.value=val}
 function el(id){return document.getElementById(id)}
 function safe(n){return isFinite(n)&&!isNaN(n)?n:0}
-function toD(eur){return eur*RATES[currency]}
-function fmt(eur,compact=false){
-  const val=Math.round(toD(eur)),sym=SYMS[currency]
+function fmt(val,compact=false){
+  val=Math.round(val)
+  const sym=SYMS[currency]
   if(compact){if(Math.abs(val)>=1e6)return sym+(val/1e6).toFixed(2)+'M';if(Math.abs(val)>=1000)return sym+Math.round(val/1000).toLocaleString()+'K'}
   return sym+val.toLocaleString()
 }
 function fmtM(m){return(!isFinite(m)||m<=0)?'—':m<1?'< 1 mo':Math.round(m)+' mo'}
 
 function calcAS(){
-  const ppm=v('ppm'),apv=vEur('apv-n'),loc=v('loc'),hrc=vEur('hrc-n'),grw=v('grw')/100
+  const ppm=v('ppm'),apv=v('apv-n'),loc=v('loc'),hrc=v('hrc-n'),grw=v('grw')/100
   const uplift=hiddenOn?1+v('hcup')/100:1
   const mpc=v('mpc')*uplift,mps=v('mps')*uplift
-  const lic=vEur('lic-n'),trm=vEur('trm-n'),trmCnt=v('trm-cnt'),txf=v('txf-n')/100,ifl=vEur('ifl-n'),obh=v('obh-n')
+  const lic=v('lic-n'),trm=v('trm-n'),trmCnt=v('trm-cnt'),txf=v('txf-n')/100,ifl=v('ifl-n'),obh=v('obh-n')
+  const market=MARKETS[currentMarket]||{}
+  const smsPerPayment=v('sms-per-payment-n')
+  const smsFee=market.smsFee!==undefined?market.smsFee:(DEFAULTS.smsFee||0)
+  const urlFee=market.urlFee!==undefined?market.urlFee:(DEFAULTS.urlFee||0)
   const pspPct=pspOn?v('psf')/100:0
   const tPpm=ppm*loc,annVol=safe(tPpm*apv*12)
   const admCur=safe((tPpm*mpc/60)*12*hrc),admSp=safe((tPpm*mps/60)*12*hrc)
   const hrsCur=safe((tPpm*mpc/60)*12),hrsSp=safe((tPpm*mps/60)*12)
   const annLic=safe(lic*loc*12 + trm*trmCnt*loc*12),annTxf=safe(annVol*txf),annPsp=safe(annVol*pspPct)
-  const withSp=safe(admSp+annLic+annTxf+annPsp),curFull=safe(admCur+annPsp)
+  const annSms=smsOn?safe(tPpm*12*smsPerPayment*smsFee):0
+  const annUrl=urlOn?safe(urlFee*loc*12):0
+  const withSp=safe(admSp+annLic+annTxf+annPsp+annSms+annUrl),curFull=safe(admCur+annPsp)
   const annSav=safe(curFull-withSp)
-  const overlapT=overlapOn?safe((vEur('ovt-n')+vEur('ovp-n'))*v('ovd')*loc):0
+  const overlapT=overlapOn?safe((v('ovt-n')+v('ovp-n'))*v('ovd')*loc):0
   const intCost=safe(obh*loc*hrc),swCost=safe(ifl*loc),implCost=safe(swCost+intCost+overlapT)
   const payback=annSav>0?safe(implCost/(annSav/12)):Infinity
   const hrsSaved=safe(hrsCur-hrsSp),fte=safe(hrsSaved/1600)
@@ -558,18 +557,19 @@ function calcAS(){
     const f=Math.pow(1+grwR,y-1),pY=tPpm*f,vY=pY*apv*12
     const cY=safe((pY*mpc/60)*12*hrc),sY=safe((pY*mps/60)*12*hrc)
     const tY=safe(vY*txf),pY2=safe(vY*pspPct)
-    const wY=safe(sY+annLic+tY+pY2),cYf=safe(cY+pY2)
+    const smsY=smsOn?safe(pY*12*smsPerPayment*smsFee):0
+    const wY=safe(sY+annLic+tY+pY2+smsY+annUrl),cYf=safe(cY+pY2)
     s5c+=cYf;s5s+=wY;yd.push({year:y,cur:cYf,sp:wY,sav:cYf-wY})
   }
   const fw=safe(s5s+implCost),fSav=safe(s5c-fw),roiM=fw>0?safe(fSav/fw):0
-  return{annVol,admCur,admSp,annLic,annTxf,annPsp,withSp,annSav,implCost,swCost,intCost,overlapT,payback,hrsSaved,fte,cppB,cppA,yd,s5c,fw,fSav,roiM,roiP:roiM*100}
+  return{annVol,admCur,admSp,annLic,annTxf,annPsp,annSms,annUrl,withSp,annSav,implCost,swCost,intCost,overlapT,payback,hrsSaved,fte,cppB,cppA,yd,s5c,fw,fSav,roiM,roiP:roiM*100}
 }
 
 function calcCS(){
-  const loc=v('loc'),hrc=vEur('hrc-n'),grw=v('grw')/100
+  const loc=v('loc'),hrc=v('hrc-n'),grw=v('grw')/100
   const cpm=v('cs-cpm'),mpc=v('cs-mpc'),mps=v('cs-mps')
-  const csLic=vEur('cs-lic-n'),csFpc=vEur('cs-fpc-n'),ifl=vEur('cs-ifl-n')
-  const acv=vEur('cs-acv-n'),tCpm=cpm*loc
+  const csLic=v('cs-lic-n'),csFpc=v('cs-fpc-n'),ifl=v('cs-ifl-n')
+  const acv=v('cs-acv-n'),tCpm=cpm*loc
   const admCur=safe((tCpm*mpc/60)*12*hrc),admSp=safe((tCpm*mps/60)*12*hrc)
   const hrsCur=safe((tCpm*mpc/60)*12),hrsSp=safe((tCpm*mps/60)*12)
   const annLic=safe(csLic*loc*12),annFpc=safe(csFpc*tCpm*12)
@@ -610,8 +610,8 @@ function mkBar(id,admCur,admSp,fees,col){
   const tip={callbacks:{label:ctx=>`${ctx.dataset.label}: ${SYMS[currency]}${Math.round(ctx.raw).toLocaleString()}`},backgroundColor:'#fff',borderColor:'rgba(0,0,0,0.1)',borderWidth:1,titleColor:'#999',bodyColor:'#1a1a1a',padding:10,cornerRadius:6}
   const col2=col==='#1a7a52'?'#0f5c3a':'#2a47d4'
   CH[id]=new Chart(el(id),{type:'bar',data:{labels:['Current','With Spense'],datasets:[
-    {label:'Admin cost',data:[Math.round(toD(admCur)),Math.round(toD(admSp))],backgroundColor:['#c0392b',col],borderRadius:4},
-    {label:'Spense fees',data:[0,Math.round(toD(fees))],backgroundColor:col2,borderRadius:4},
+    {label:'Admin cost',data:[Math.round(admCur),Math.round(admSp)],backgroundColor:['#c0392b',col],borderRadius:4},
+    {label:'Spense fees',data:[0,Math.round(fees)],backgroundColor:col2,borderRadius:4},
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tip},scales:{x:{ticks:{...ts},grid:{display:false},border:{display:false},stacked:true},y:{ticks:{callback:tf,...ts},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false},stacked:true}}}})
 }
 function mkSav(id,savD,labels,col){
@@ -649,9 +649,9 @@ function renderAS(d){
   let rows=d.yd.map((y,i)=>`<tr style="${i%2===1?'background:rgba(0,0,0,0.018)':''}"><td class="td-label">Year ${y.year}</td><td>${fmt(y.cur,true)}</td><td>${fmt(y.sp,true)}</td><td class="td-savings">${fmt(y.sav,true)}</td></tr>`).join('')
   rows+=`<tr class="total-row"><td class="td-label">Total</td><td>${fmt(d.s5c,true)}</td><td>${fmt(d.fw,true)}</td><td class="td-savings">${fmt(d.fSav,true)}</td></tr>`
   el('as-tbl').innerHTML=rows
-  mkLine('as-lineChart',lbls,d.yd.map(y=>Math.round(toD(y.cur))),d.yd.map(y=>Math.round(toD(y.sp))),'#3d60f5')
-  mkBar('as-barChart',d.admCur,d.admSp,d.annLic+d.annTxf+d.annPsp,'#3d60f5')
-  mkSav('as-savChart',d.yd.map(y=>Math.round(toD(y.sav))),slbls,'#3d60f5')
+  mkLine('as-lineChart',lbls,d.yd.map(y=>Math.round(y.cur)),d.yd.map(y=>Math.round(y.sp)),'#3d60f5')
+  mkBar('as-barChart',d.admCur,d.admSp,d.annLic+d.annTxf+d.annPsp+d.annSms+d.annUrl,'#3d60f5')
+  mkSav('as-savChart',d.yd.map(y=>Math.round(y.sav)),slbls,'#3d60f5')
 }
 
 function renderCS(d){
@@ -671,9 +671,9 @@ function renderCS(d){
   let rows=d.yd.map((y,i)=>`<tr style="${i%2===1?'background:rgba(0,0,0,0.018)':''}"><td class="td-label">Year ${y.year}</td><td>${fmt(y.cur,true)}</td><td>${fmt(y.sp,true)}</td><td class="td-savings">${fmt(y.sav,true)}</td></tr>`).join('')
   rows+=`<tr class="total-row"><td class="td-label">Total</td><td>${fmt(d.s5c,true)}</td><td>${fmt(d.fw,true)}</td><td class="td-savings">${fmt(d.fSav,true)}</td></tr>`
   el('cs-tbl').innerHTML=rows
-  mkLine('cs-lineChart',lbls,d.yd.map(y=>Math.round(toD(y.cur))),d.yd.map(y=>Math.round(toD(y.sp))),'#1a7a52')
+  mkLine('cs-lineChart',lbls,d.yd.map(y=>Math.round(y.cur)),d.yd.map(y=>Math.round(y.sp)),'#1a7a52')
   mkBar('cs-barChart',d.admCur,d.admSp,d.spCost,'#1a7a52')
-  mkSav('cs-savChart',d.yd.map(y=>Math.round(toD(y.sav))),slbls,'#1a7a52')
+  mkSav('cs-savChart',d.yd.map(y=>Math.round(y.sav)),slbls,'#1a7a52')
 }
 
 function renderCombined(as,cs){
@@ -701,7 +701,7 @@ function renderCombined(as,cs){
   }).join('')
   rows+=`<tr class="total-row"><td class="td-label">Total</td><td>${fmt(as.fSav,true)}</td><td>${fmt(cs.fSav,true)}</td><td class="td-savings">${fmt(safe(as.fSav+cs.fSav),true)}</td></tr>`
   el('comb-tbl').innerHTML=rows
-  mkStacked('comb-chart',as.yd.map(y=>Math.round(toD(y.sav))),cs.yd.map(y=>Math.round(toD(y.sav))),lbls)
+  mkStacked('comb-chart',as.yd.map(y=>Math.round(y.sav)),cs.yd.map(y=>Math.round(y.sav)),lbls)
 }
 
 function updateHeader(as,cs){
@@ -723,8 +723,7 @@ function updatePrint(as,cs){
   el('print-date').textContent=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})
   const vl={'as':'Aftersales ROI & TCO','cs':'Car Sales ROI & TCO','combined':'Combined ROI & TCO'}
   el('print-view-label').textContent=vl[currentView]
-  const sym=SYMS[currency]
-  const fmtN=function(numId){return fmt(vEur(numId))}
+  const fmtN=function(numId){return fmt(v(numId))}
   let params=currentView==='cs'?[
     ['Cars/mo (per loc)',Math.round(v('cs-cpm'))],['Locations',Math.round(v('loc'))],
     ['Avg car value',fmtN('cs-acv-n')],['Admin cost/hr',fmtN('hrc-n')],
@@ -747,18 +746,6 @@ function update(){
   const as=calcAS(),cs=calcCS()
   renderAS(as);renderCS(cs);renderCombined(as,cs)
   updateHeader(as,cs);updatePrint(as,cs)
-}
-
-// Hidden EUR fields — used internally by calculations for money inputs
-// Each number input in display currency has a corresponding hidden field storing EUR value
-function syncEurFromDisplay(numId, eurId, isMoney){
-  var e=document.getElementById(numId)
-  var h=document.getElementById(eurId)
-  if(!e) return
-  var displayVal=parseFloat(e.value)
-  if(isNaN(displayVal)) return
-  var eurVal=isMoney ? displayVal/RATES[currency] : displayVal
-  if(h) h.value=eurVal
 }
 
 // Legacy compat — no-ops since sliders are removed for money fields
@@ -803,46 +790,31 @@ function switchView(view,btn){
 
 function toggleHiddenComplexity(){hiddenOn=!hiddenOn;el('t-hidden').classList.toggle('on',hiddenOn);el('hidden-rows').classList.toggle('hidden',!hiddenOn);update()}
 function togglePsp(){pspOn=!pspOn;el('t-psp').classList.toggle('on',pspOn);el('psp-rows').classList.toggle('hidden',!pspOn);update()}
+function toggleSms(){smsOn=!smsOn;el('t-sms').classList.toggle('on',smsOn);el('sms-rows').classList.toggle('hidden',!smsOn);update()}
+function togglePersonalisedUrl(){urlOn=!urlOn;el('t-url').classList.toggle('on',urlOn);update()}
 function toggleOverlap(){overlapOn=!overlapOn;el('t-overlap').classList.toggle('on',overlapOn);el('overlap-rows').classList.toggle('hidden',!overlapOn);update()}
 function toggleRisk(){riskOn=!riskOn;el('t-risk').classList.toggle('on',riskOn);el('risk-rows').classList.toggle('hidden',!riskOn);update()}
 
 function applyMarket(key,btn){
   const m=MARKETS[key]
+  currentMarket=key
   document.querySelectorAll('.market-btn').forEach(b=>b.classList.remove('active'))
   if(btn)btn.classList.add('active')
-  currency=m.currency; el('currency').value=m.currency
-  const rate=RATES[currency]
+  currency=m.currency
   sv('ppm',m.ppm); sv('mpc',m.mpc); sv('mps',m.mps)
   sv('grw',m.grw); sv('loc',m.loc)
-  sv('hrc-n',   Math.round(m.hrc*rate))
-  sv('apv-n',   Math.round(m.apv*rate))
-  sv('lic-n',   Math.round(m.lic*rate))
-  sv('trm-n',   Math.round(m.trm*rate))
+  sv('hrc-n',   m.hrc)
+  sv('apv-n',   m.apv)
+  sv('lic-n',   m.lic)
+  sv('trm-n',   m.trm)
   sv('txf-n',   m.txf)
-  sv('ifl-n',   Math.round(m.ifl*rate))
+  sv('ifl-n',   m.ifl)
   sv('obh-n',   m.obh)
-  sv('cs-lic-n', Math.round(m.csLic*rate))
-  sv('cs-fpc-n', Math.round(m.csFpc*rate))
+  sv('cs-lic-n', m.csLic)
+  sv('cs-fpc-n', m.csFpc)
+  sv('cs-ifl-n', m.csIfl)
   update()
 }
-
-function onCurrencyChange(){
-  const oldRate=RATES[currency]
-  currency=el('currency').value
-  const newRate=RATES[currency]
-  document.querySelectorAll('.market-btn').forEach(b=>b.classList.remove('active'))
-  ;['hrc-n','apv-n','lic-n','trm-n','ifl-n','ovt-n','ovp-n',
-    'cs-acv-n','cs-lic-n','cs-fpc-n','cs-ifl-n'].forEach(function(nid){
-    var e=el(nid); if(!e) return
-    var eurVal=(parseFloat(e.value)||0)/oldRate
-    e.value=Math.round(eurVal*newRate)
-  })
-  update()
-}
-
-
-
-
 function applyScenario(minutes,btn){
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'))
   if(btn)btn.classList.add('active')
@@ -851,9 +823,12 @@ function applyScenario(minutes,btn){
 
 // Boot — apply DEFAULTS then run
 ;(function boot(){
+  currentMarket=DEFAULTS.market||''
   currency=DEFAULTS.currency||'EUR'
   hiddenOn=!!DEFAULTS.hiddenOn
   pspOn=!!DEFAULTS.pspOn
+  smsOn=DEFAULTS.smsOn!==false
+  urlOn=DEFAULTS.urlOn!==false
   overlapOn=!!DEFAULTS.overlapOn
   riskOn=!!DEFAULTS.riskOn
 
@@ -861,15 +836,13 @@ function applyScenario(minutes,btn){
   var svd=function(id,val){var e=document.getElementById(id);if(e)e.value=val}
   var eld=function(id){return document.getElementById(id)}
 
-  svd('currency',d.currency)
   svd('loc',d.loc); svd('grw',d.grw)
   svd('ppm',d.ppm); svd('mpc',d.mpc); svd('mps',d.mps)
   svd('txf-n',d.txf); svd('obh-n',d.obh)
-  svd('hcup',d.hcup); svd('psf',d.psf)
+  svd('hcup',d.hcup); svd('psf',d.psf); svd('sms-per-payment-n',d.smsPerPayment)
   svd('ovd',d.ovd); svd('trm-cnt',d.trmCnt)
   svd('cs-cpm',d.csCpm); svd('cs-mpc',d.csMpc); svd('cs-mps',d.csMps); svd('cs-riy',d.csRiy)
 
-  // Money fields — stored in display currency, set directly, no conversion needed
   svd('hrc-n',  d.hrc)
   svd('apv-n',  d.apv)
   svd('lic-n',  d.lic)
@@ -884,8 +857,15 @@ function applyScenario(minutes,btn){
 
   if(hiddenOn){eld('t-hidden')&&eld('t-hidden').classList.add('on');eld('hidden-rows')&&eld('hidden-rows').classList.remove('hidden')}
   if(pspOn){eld('t-psp')&&eld('t-psp').classList.add('on');eld('psp-rows')&&eld('psp-rows').classList.remove('hidden')}
+  if(!smsOn){eld('t-sms')&&eld('t-sms').classList.remove('on');eld('sms-rows')&&eld('sms-rows').classList.add('hidden')}
+  if(urlOn){eld('t-url')&&eld('t-url').classList.add('on')}
+  else{eld('t-url')&&eld('t-url').classList.remove('on')}
   if(overlapOn){eld('t-overlap')&&eld('t-overlap').classList.add('on');eld('overlap-rows')&&eld('overlap-rows').classList.remove('hidden')}
   if(riskOn){eld('t-risk')&&eld('t-risk').classList.add('on');eld('risk-rows')&&eld('risk-rows').classList.remove('hidden')}
+  if(currentMarket){
+    var marketBtn=document.querySelector('.market-btn[data-market="'+currentMarket+'"]')
+    if(marketBtn) marketBtn.classList.add('active')
+  }
 
   update()
 
@@ -1053,10 +1033,12 @@ function doPublish(){
 
 function buildDefaults(){
   return{
-    currency:currency,hiddenOn:hiddenOn,pspOn:pspOn,overlapOn:overlapOn,riskOn:riskOn,view:currentView,
-    loc:v('loc'),grw:v('grw'),mpc:v('mpc'),mps:v('mps'),obh:v('obh-n'),hcup:v('hcup'),psf:v('psf'),
+    market:currentMarket,currency:currency,hiddenOn:hiddenOn,pspOn:pspOn,smsOn:smsOn,urlOn:urlOn,overlapOn:overlapOn,riskOn:riskOn,view:currentView,
+    loc:v('loc'),grw:v('grw'),mpc:v('mpc'),mps:v('mps'),obh:v('obh-n'),hcup:v('hcup'),psf:v('psf'),smsPerPayment:v('sms-per-payment-n'),
     ovd:v('ovd'),trmCnt:v('trm-cnt'),txf:v('txf-n'),ppm:v('ppm'),
     csCpm:v('cs-cpm'),csMpc:v('cs-mpc'),csMps:v('cs-mps'),csRiy:v('cs-riy'),
+    smsFee:((MARKETS[currentMarket]||{}).smsFee!==undefined?(MARKETS[currentMarket]||{}).smsFee:(DEFAULTS.smsFee||0)),
+    urlFee:((MARKETS[currentMarket]||{}).urlFee!==undefined?(MARKETS[currentMarket]||{}).urlFee:(DEFAULTS.urlFee||0)),
     hrc:Math.round(parseFloat(el('hrc-n').value)||0),
     apv:Math.round(parseFloat(el('apv-n').value)||0),
     lic:Math.round(parseFloat(el('lic-n').value)||0),

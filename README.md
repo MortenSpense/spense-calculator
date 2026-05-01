@@ -25,13 +25,15 @@ The calculator models the return on investment for two Spense products:
 - **Combined** — presents a unified business case when both products are relevant
  
 Results include annual savings, 5-year net savings, payback period, 5-year ROI, FTE equivalent saved, and a full year-by-year breakdown.
+
+Market presets now apply native-currency assumptions directly. The calculator no longer converts through an EUR pivot or carries exchange-rate disclaimers.
  
 ---
  
 ## How to use it in a sales meeting
  
 1. Open the calculator in a browser (either the live URL or the local HTML file)
-2. Select the relevant **market preset** to load typical assumptions for that country
+2. Select the relevant **market preset** to load typical assumptions and native pricing for that market
 3. Adjust inputs to match the prospect — locations, payment volumes, admin time, pricing
 4. Walk the prospect through the results on screen
 5. Use **Export PDF** to print a branded leave-behind on A4 landscape
@@ -94,15 +96,16 @@ Selecting a market preset loads typical assumptions for that country including c
  
 | Market | Currency | Notes |
 |--------|----------|-------|
-| Norway | NOK | Default market |
+| Norway | NOK | |
 | Denmark | DKK | Validated against live Nellemann/Ejby customer data |
+| Sweden | SEK | Added 2026-04-29 ahead of Claus Persson's start |
 | Benelux | EUR | |
 | Germany | EUR | |
 | Switzerland | CHF | |
 | Italy | EUR | |
 | UK | GBP | |
- 
-Car sales pricing for non-Denmark markets is placeholder — update when confirmed pricing is available.
+
+All market pricing is stored directly in native currency. Aftersales SMS notifications and personalised URL fees are included as hidden defaults in the advanced assumptions section and are on by default.
  
 ---
  
@@ -131,6 +134,7 @@ The live URL updates automatically within ~1 minute. No further action needed.
  
 | Version | Changes |
 |---------|---------|
+| v3.1 | Native-currency market presets replace EUR pivot model; exchange-rate disclaimer removed; Sweden support added; SMS + personalised URL fees modeled as hidden aftersales defaults |
 | v3.0 | Publish for prospect button — one-click hosted URLs via Cloudflare backend; authenticated publish endpoint (PUBLISH_SECRET); rep name dropdown (Lars, Didrik, Morten, Claus); 5MB payload guard |
 | v2.6 | Sliders removed for all monetary fields — number inputs only, eliminates all rounding/snap bugs; Spense pricing fields locked as read-only in saved prospect copies |
 | v2.5 | Active view saved with assumptions — prospect lands on correct tab automatically; slider snap bug fixed in Save assumptions (sliders now used as source of truth, not number inputs); locations slider extended to 50 |

@@ -1,19 +1,20 @@
 # Spense Calculator Project Overview
 
-> Last updated: 2026-04-28
-> Author: Haalee
+> Last updated: 2026-05-01
+> Author: Henning
 
 ## Overview
 
-Backend for the Spense ROI calculator. Sales reps use the calculator to configure a prospect-specific ROI analysis, publish it as a hosted URL, and track whether the prospect opens it. The system runs on Cloudflare Workers and R2 with no external database.
+Monorepo for the Spense ROI calculator. Sales reps use the frontend to configure a prospect-specific ROI analysis, publish it as a hosted URL, and track whether the prospect opens it. The backend runs on Cloudflare Workers and R2 with no external database.
 
 ## Project Structure
 
-`spense-backend` (this repo) and `spense-calculator` (frontend) are two repos for one product.
+`spense-calculator` is the authoritative monorepo for the calculator frontend and the Cloudflare Workers backend.
 
-- Todos and sprints live here in `spense-backend`.
-- Frontend-specific context is in `/Users/morten_spense/spense-calculator/.clairvoyance/`.
-- A task touching both repos gets one todo here, not one in each.
+- Frontend entrypoint: `index.html`
+- Backend workers: `publish/`, `tracker/`, `dashboard/`
+- Frontend-specific context and product docs live in `.clairvoyance/`.
+- Todos and sprints remain associated with the legacy `spense-backend` workspace ID until the workspace metadata is migrated.
 - `/Users/morten_spense/Downloads/spense-calculator` is stale — ignore it.
 
 ## Live URLs
@@ -54,6 +55,8 @@ The rep list is stored in R2 (`config/reps.json`) and managed from the dashboard
 
 - Aftersales, Car Sales, and Combined views.
 - Market presets: Norway, Denmark, **Sweden** (added 2026-04-29 for Claus's start on 2026-05-04), Benelux, Germany, Switzerland, Italy, UK.
+- Market pricing is native-currency only. The old EUR pivot layer, manual currency dropdown, and exchange-rate disclaimer were removed on 2026-05-01.
+- Aftersales pricing now includes hidden-default SMS and personalised URL fees in the advanced assumptions section.
 - Payback period display shows `< 1 mo` for sub-month payback periods.
 - **Publish for prospect**: primary distribution action. Locks Spense pricing read-only in the published copy.
 - **Export PDF**: secondary action.
@@ -104,7 +107,9 @@ The rep list is stored in R2 (`config/reps.json`) and managed from the dashboard
 
 - Aftersales payments are per location, multiplied by location count.
 - Denmark aftersales baseline: 229 payments/month/location, 10 minutes per payment.
+- Native-currency pricing is validated for 8 rep-facing markets; the calculator no longer converts pricing through an EUR base table.
 - Car sales pricing (Denmark): DKK 990/location/month + DKK 30/car sold.
+- Aftersales SMS notifications and personalised URL fees are modeled as hidden defaults and included in Spense costs unless a rep turns them off.
 - Car sales ROI is highly sensitive to minutes-per-car. 18 minutes from Hedin Norway is an important validation point.
 - PSP fee is modelled on both sides (net-zero impact on savings by default).
 

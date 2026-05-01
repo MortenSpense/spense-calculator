@@ -1,7 +1,7 @@
 # Spense Calculator Product History
 
-> Last updated: 2026-04-22
-> Author: Quinn
+> Last updated: 2026-05-01
+> Author: Henning
 > Source: Morten's handoff of the Haalee collaboration history.
 
 ## What This Project Is
@@ -59,6 +59,7 @@ Saved/published prospect copies:
 | v2.4 | Added Save assumptions |
 | v2.6 | Removed monetary sliders; locked pricing in saved copies |
 | v3.0 | Added Publish for prospect with Cloudflare backend |
+| v3.1 | Replaced EUR pivot pricing with native-currency market presets; added Sweden preset; added hidden-default SMS and personalised URL fees to aftersales costs |
 
 ## Validated Assumptions
 
@@ -74,6 +75,7 @@ Car Sales:
 
 - Cars sold are modeled per location.
 - Danish base pricing: DKK 990 per location/month plus DKK 30 per car sold.
+- Native-currency pricing is validated for 8 rep-facing markets: Norway, Denmark, Sweden, Benelux, Germany, Switzerland, Italy, UK.
 - Hedin Norway supplied the key 18-minutes-per-car assumption used in the Bil i Nord case.
 - The car-sales ROI is highly sensitive to admin minutes per car.
 - Risk/key-handover exposure is shown as a supplemental value lever, not included directly in savings.
@@ -88,7 +90,9 @@ Reference cases:
 
 - Monetary fields are number inputs only. Do not reintroduce sliders for money; the old hybrid design caused repeated rounding/snapping bugs.
 - Non-monetary fields can remain sliders.
+- Market presets are native-currency only. Do not reintroduce exchange-rate conversion, hidden EUR shadow values, or a free currency dropdown.
 - Pricing is visible but read-only in prospect copies.
+- Aftersales SMS notifications and personalised URL fees are included as advanced-section defaults and stay on by default unless a rep explicitly turns them off.
 - Use Spense blue `#3d60f5`.
 - Use Montserrat for headings/numbers and Open Sans for body text.
 - Use ISO code market badges, not emoji flags.
