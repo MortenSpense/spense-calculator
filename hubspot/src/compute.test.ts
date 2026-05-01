@@ -21,13 +21,13 @@ describe('compute()', () => {
       expect(result.netAnnualSavings).toBeGreaterThan(0);
     });
 
-    it('annual labour today: 1145 payments/mo × 10 min × 12 mo × 285 DKK/h ≈ 652,650 DKK', () => {
-      // tPpm = 229 × 5 = 1145; hours/year = 1145 × (10/60) × 12 = 2290; × 285 DKK/h
-      expect(result.adminCostToday).toBeCloseTo(652_650, 0);
+    it('annual labour today: 1145 payments/mo × 10 min × 12 mo × 340 DKK/h ≈ 778,600 DKK', () => {
+      // tPpm = 229 × 5 = 1145; hours/year = 1145 × (10/60) × 12 = 2290; × 340 DKK/h
+      expect(result.adminCostToday).toBeCloseTo(778_600, 0);
     });
 
-    it('annual labour with Spense: same volume × 3 min × 285 DKK/h ≈ 195,795 DKK', () => {
-      expect(result.adminCostWithSpense).toBeCloseTo(195_795, 0);
+    it('annual labour with Spense: same volume × 3 min × 340 DKK/h ≈ 233,580 DKK', () => {
+      expect(result.adminCostWithSpense).toBeCloseTo(233_580, 0);
     });
 
     it('Denmark txf = 0.05% (post-correction): annual fee on 65.6M DKK volume ≈ 32,800 DKK', () => {

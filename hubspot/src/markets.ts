@@ -8,10 +8,12 @@
  * - `avgPaymentValue` aligned with rep-tool presets after Henning's refactor
  *   on 2026-05-01: ~600 EUR equivalent per market, except Norway and Sweden
  *   which Morten asked to bake in at 7,000 NOK and 7,000 SEK respectively.
- * - `hourlyCost` is set to realistic native-currency labour rates for each
- *   market (rep-facing tool's hrc values are inherited from EUR-pivot and
- *   may produce nonsense for Nordic markets if not converted; flagged with
- *   Morten 2026-05-01 for Henning to review).
+ * - `hourlyCost` for Denmark = 340 DKK (Morten's validated loaded labour
+ *   cost used in business cases). Norway and Sweden derived as currency
+ *   equivalents: 530 NOK and 500 SEK respectively. Other markets use
+ *   Henning's rep-tool values (which are correctly in native currency
+ *   for non-Nordic markets). Flagged with Morten 2026-05-01 — Henning
+ *   to update index.html to match these Nordic values.
  *
  * Sweden was added 2026-04-29 ahead of Claus Persson's start (2026-05-04);
  * its industry assumptions mirror Denmark pending Claus's review.
@@ -62,7 +64,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
   norway: {
     currency: 'NOK',
     displayName: 'Norway',
-    hourlyCost: 465,
+    hourlyCost: 530,
     avgPaymentValue: 7000,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
@@ -81,7 +83,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
   denmark: {
     currency: 'DKK',
     displayName: 'Denmark',
-    hourlyCost: 285,
+    hourlyCost: 340,
     avgPaymentValue: 4500,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
@@ -100,7 +102,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
   sweden: {
     currency: 'SEK',
     displayName: 'Sweden',
-    hourlyCost: 420,
+    hourlyCost: 500,
     avgPaymentValue: 7000,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
@@ -176,7 +178,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
   switzerland: {
     currency: 'CHF',
     displayName: 'Switzerland',
-    hourlyCost: 53,
+    hourlyCost: 55,
     avgPaymentValue: 555,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
@@ -195,7 +197,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
   uk: {
     currency: 'GBP',
     displayName: 'United Kingdom',
-    hourlyCost: 24,
+    hourlyCost: 28,
     avgPaymentValue: 520,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
