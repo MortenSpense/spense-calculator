@@ -2,10 +2,16 @@
  * Market presets for the lead-gen calculator.
  *
  * All monetary values are in **native currency** — there is no EUR-pivot.
- * Pricing matrix validated 2026-04-29 with Morten. Industry-assumption fields
- * (hourlyCost, avgPaymentValue, growthRatePct) are derived from the rep-facing
- * tool's existing presets and may be revised once Henning's native-currency
- * frontend refactor lands and live data refines them.
+ *
+ * - Spense pricing (license, txf, terminal, onboarding, sms, url, csLic, csFpc)
+ *   was validated with Morten on 2026-04-29.
+ * - `avgPaymentValue` aligned with rep-tool presets after Henning's refactor
+ *   on 2026-05-01: ~600 EUR equivalent per market, except Norway and Sweden
+ *   which Morten asked to bake in at 7,000 NOK and 7,000 SEK respectively.
+ * - `hourlyCost` is set to realistic native-currency labour rates for each
+ *   market (rep-facing tool's hrc values are inherited from EUR-pivot and
+ *   may produce nonsense for Nordic markets if not converted; flagged with
+ *   Morten 2026-05-01 for Henning to review).
  *
  * Sweden was added 2026-04-29 ahead of Claus Persson's start (2026-05-04);
  * its industry assumptions mirror Denmark pending Claus's review.
@@ -57,7 +63,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
     currency: 'NOK',
     displayName: 'Norway',
     hourlyCost: 465,
-    avgPaymentValue: 31500,
+    avgPaymentValue: 7000,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
     onboardingHoursPerLoc: 3,
@@ -76,7 +82,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
     currency: 'DKK',
     displayName: 'Denmark',
     hourlyCost: 285,
-    avgPaymentValue: 4775,
+    avgPaymentValue: 4500,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
     onboardingHoursPerLoc: 3,
@@ -114,7 +120,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
     currency: 'EUR',
     displayName: 'Benelux',
     hourlyCost: 32,
-    avgPaymentValue: 2700,
+    avgPaymentValue: 600,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
     onboardingHoursPerLoc: 3,
@@ -133,7 +139,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
     currency: 'EUR',
     displayName: 'Germany',
     hourlyCost: 30,
-    avgPaymentValue: 2800,
+    avgPaymentValue: 600,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
     onboardingHoursPerLoc: 3,
@@ -152,7 +158,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
     currency: 'EUR',
     displayName: 'Italy',
     hourlyCost: 24,
-    avgPaymentValue: 2400,
+    avgPaymentValue: 600,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
     onboardingHoursPerLoc: 3,
@@ -171,7 +177,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
     currency: 'CHF',
     displayName: 'Switzerland',
     hourlyCost: 53,
-    avgPaymentValue: 2700,
+    avgPaymentValue: 555,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
     onboardingHoursPerLoc: 3,
@@ -190,7 +196,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
     currency: 'GBP',
     displayName: 'United Kingdom',
     hourlyCost: 24,
-    avgPaymentValue: 2150,
+    avgPaymentValue: 520,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
     onboardingHoursPerLoc: 3,
@@ -211,7 +217,7 @@ export const MARKETS: Record<MarketKey, MarketPreset> = {
     currency: 'EUR',
     displayName: 'Other EUR market',
     hourlyCost: 30,
-    avgPaymentValue: 2700,
+    avgPaymentValue: 600,
     growthRatePct: 0.03,
     minutesPerPaymentSpense: 3,
     onboardingHoursPerLoc: 3,
