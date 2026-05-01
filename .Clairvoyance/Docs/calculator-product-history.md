@@ -59,7 +59,7 @@ Saved/published prospect copies:
 | v2.4 | Added Save assumptions |
 | v2.6 | Removed monetary sliders; locked pricing in saved copies |
 | v3.0 | Added Publish for prospect with Cloudflare backend |
-| v3.1 | Replaced EUR pivot pricing with native-currency market presets; added Sweden preset; added hidden-default SMS and personalised URL fees to aftersales costs |
+| v3.1 | Replaced EUR pivot pricing with native-currency market presets; added Sweden preset; added hidden-default SMS and personalised URL fees to aftersales costs; replaced the `Payments / month` control with a dense-slider hybrid; normalized aftersales `Avg payment value` presets from DKK 4,500 |
 
 ## Validated Assumptions
 
@@ -68,6 +68,7 @@ Aftersales:
 - Payments are modeled per location.
 - Real customer sample: 257, 257, 158, 203, 270 payments/month/location.
 - Denmark baseline: 229 payments/month/location.
+- Aftersales `Avg payment value` presets are anchored on DKK 4,500 and converted per market with nearest-`5` rounding: NOK 670, DKK 4500, SEK 655, EUR 600, CHF 555, GBP 520.
 - 10 minutes per payment is treated as a validated conservative baseline from the Nellemann case.
 - A payment is one payment against an invoice, regardless of invoice line count.
 
@@ -90,6 +91,7 @@ Reference cases:
 
 - Monetary fields are number inputs only. Do not reintroduce sliders for money; the old hybrid design caused repeated rounding/snapping bugs.
 - Non-monetary fields can remain sliders.
+- `Payments / month` is the deliberate exception: use the hybrid dense-slider + direct-entry control rather than a plain linear slider, because the working range clusters around 200 with occasional use up to 500-600.
 - Market presets are native-currency only. Do not reintroduce exchange-rate conversion, hidden EUR shadow values, or a free currency dropdown.
 - Pricing is visible but read-only in prospect copies.
 - Aftersales SMS notifications and personalised URL fees are included as advanced-section defaults and stay on by default unless a rep explicitly turns them off.

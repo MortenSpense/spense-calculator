@@ -56,6 +56,7 @@ The rep list is stored in R2 (`config/reps.json`) and managed from the dashboard
 - Aftersales, Car Sales, and Combined views.
 - Market presets: Norway, Denmark, **Sweden** (added 2026-04-29 for Claus's start on 2026-05-04), Benelux, Germany, Switzerland, Italy, UK.
 - Market pricing is native-currency only. The old EUR pivot layer, manual currency dropdown, and exchange-rate disclaimer were removed on 2026-05-01.
+- The `Payments / month` control uses a stacked hybrid layout: dense slider for `50–600`, with `-5/+5` buttons and direct numeric entry for precision.
 - Aftersales pricing now includes hidden-default SMS and personalised URL fees in the advanced assumptions section.
 - Payback period display shows `< 1 mo` for sub-month payback periods.
 - **Publish for prospect**: primary distribution action. Locks Spense pricing read-only in the published copy.
@@ -107,6 +108,7 @@ The rep list is stored in R2 (`config/reps.json`) and managed from the dashboard
 
 - Aftersales payments are per location, multiplied by location count.
 - Denmark aftersales baseline: 229 payments/month/location, 10 minutes per payment.
+- Aftersales `Avg payment value` presets are normalized from DKK 4,500 and rounded to the nearest `5` in each market currency.
 - Native-currency pricing is validated for 8 rep-facing markets; the calculator no longer converts pricing through an EUR base table.
 - Car sales pricing (Denmark): DKK 990/location/month + DKK 30/car sold.
 - Aftersales SMS notifications and personalised URL fees are modeled as hidden defaults and included in Spense costs unless a rep turns them off.
