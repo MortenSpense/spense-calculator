@@ -68,7 +68,7 @@ Aftersales:
 - Payments are modeled per location.
 - Real customer sample: 257, 257, 158, 203, 270 payments/month/location.
 - Denmark baseline: 229 payments/month/location.
-- Aftersales `Avg payment value` presets are anchored on DKK 4,500 and converted per market with nearest-`5` rounding: NOK 670, DKK 4500, SEK 655, EUR 600, CHF 555, GBP 520.
+- Aftersales `Avg payment value` presets are anchored on DKK 4,500 and converted per market with nearest-`5` rounding: NOK 7000, DKK 4500, SEK 7000, EUR 600, CHF 555, GBP 520.
 - 10 minutes per payment is treated as a validated conservative baseline from the Nellemann case.
 - A payment is one payment against an invoice, regardless of invoice line count.
 
