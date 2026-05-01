@@ -27,6 +27,7 @@ The calculator models the return on investment for two Spense products:
 Results include annual savings, 5-year net savings, payback period, 5-year ROI, FTE equivalent saved, and a full year-by-year breakdown.
 
 Market presets now apply native-currency assumptions directly. The calculator no longer converts through an EUR pivot or carries exchange-rate disclaimers.
+The `Payments / month` field uses a hybrid control: a non-linear slider for rough positioning, plus `-5/+5` buttons and a direct number input for precision.
  
 ---
  
@@ -106,6 +107,7 @@ Selecting a market preset loads typical assumptions for that country including c
 | UK | GBP | |
 
 All market pricing is stored directly in native currency. Aftersales SMS notifications and personalised URL fees are included as hidden defaults in the advanced assumptions section and are on by default.
+Aftersales `Avg payment value` presets are normalized from a DKK 4,500 baseline and rounded to the nearest `5` in each market currency.
  
 ---
  
@@ -134,7 +136,7 @@ The live URL updates automatically within ~1 minute. No further action needed.
  
 | Version | Changes |
 |---------|---------|
-| v3.1 | Native-currency market presets replace EUR pivot model; exchange-rate disclaimer removed; Sweden support added; SMS + personalised URL fees modeled as hidden aftersales defaults |
+| v3.1 | Native-currency market presets replace EUR pivot model; exchange-rate disclaimer removed; Sweden support added; SMS + personalised URL fees modeled as hidden aftersales defaults; `Payments / month` changed to a hybrid dense-slider + direct-entry control; aftersales `Avg payment value` presets normalized from DKK 4,500 |
 | v3.0 | Publish for prospect button — one-click hosted URLs via Cloudflare backend; authenticated publish endpoint (PUBLISH_SECRET); rep name dropdown (Lars, Didrik, Morten, Claus); 5MB payload guard |
 | v2.6 | Sliders removed for all monetary fields — number inputs only, eliminates all rounding/snap bugs; Spense pricing fields locked as read-only in saved prospect copies |
 | v2.5 | Active view saved with assumptions — prospect lands on correct tab automatically; slider snap bug fixed in Save assumptions (sliders now used as source of truth, not number inputs); locations slider extended to 50 |
