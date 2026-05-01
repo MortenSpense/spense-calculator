@@ -72,6 +72,8 @@ footer{max-width:1300px;margin:2rem auto 0;padding:1rem 1.5rem;border-top:1px so
 .row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .row:last-child{margin-bottom:0}
 .row label{font-size:12px;color:var(--text2);flex:1;min-width:0;line-height:1.3;font-family:var(--body)}
+.row.stack{display:block}
+.row.stack label{display:block;margin-bottom:6px}
 input[type=range]{-webkit-appearance:none;appearance:none;width:80px;flex-shrink:0;height:3px;border-radius:2px;background:var(--surface2);outline:none;cursor:pointer;border:none}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--blue);border:2.5px solid #fff;box-shadow:0 0 0 1px var(--blue);cursor:pointer;transition:transform .1s}
 input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.15)}
@@ -148,6 +150,19 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
 .num-input[readonly]:focus{box-shadow:none;border-color:var(--border)}
 .num-unit{font-size:11px;color:var(--text3);font-family:var(--body);width:20px}
 .row.editable input[type=range]{width:65px}
+.range-combo{display:flex;align-items:center;gap:8px;min-width:0}
+.range-combo input[type=range]{flex:1;min-width:160px}
+.range-precision{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.step-btn{border:1px solid var(--border2);background:var(--surface2);color:var(--text2);border-radius:6px;font-family:var(--font);font-size:11px;font-weight:600;padding:4px 8px;cursor:pointer;line-height:1}
+.step-btn:hover{border-color:var(--blue);color:var(--blue)}
+.step-btn:active{transform:translateY(1px)}
+.range-note{font-size:10px;color:var(--text3);font-family:var(--body);min-width:60px;text-align:right;white-space:nowrap}
+@media (max-width:720px){
+  .range-combo{flex-wrap:wrap;align-items:flex-start}
+  .range-combo input[type=range]{width:100%;min-width:0;flex:1 0 100%}
+  .range-precision{order:2}
+  .range-note{order:3;margin-left:auto}
+}
 .hidden{display:none!important}
 .view-section{display:none}
 .view-section.active{display:block}
@@ -272,7 +287,19 @@ tr.total-row td{border-top:2px solid var(--sep);border-bottom:none;padding-top:8
           <button class="preset-btn active" onclick="applyScenario(10,this)">Typical<small>10 min</small></button>
           <button class="preset-btn" onclick="applyScenario(15,this)">Complex<small>15 min</small></button>
         </div>
-        <div class="row"><label>Payments / month (per location)</label><input type="range" id="ppm" min="50" max="1000" step="5" value="150" oninput="update()"><span class="val" id="ppm-v">150</span></div>
+        <div class="row stack">
+          <label>Payments / month (per location)</label>
+          <div class="range-combo">
+            <input type="range" id="ppm-slider" min="0" max="1000" step="1" value="145" oninput="onPpmSliderInput()">
+            <div class="range-precision">
+              <button type="button" class="step-btn" onclick="stepPpm(-5)">-5</button>
+              <input type="number" id="ppm-n" class="num-input" min="50" max="1000" step="1" value="150" onchange="onPpmNumberChange()" onkeydown="onPpmNumberKeydown(event)">
+              <button type="button" class="step-btn" onclick="stepPpm(5)">+5</button>
+            </div>
+          </div>
+          <input type="hidden" id="ppm" value="150">
+          <span class="range-note" id="ppm-v">dense to 600/mo</span>
+        </div>
         <div class="row editable"><label>Avg payment value</label><input type="number" id="apv-n" class="num-input" value="2706" oninput="update()"><span class="num-unit curr-sym">€</span></div>
         <div class="row"><label>Admin min / payment (now)</label><input type="range" id="mpc" min="3" max="30" step="1" value="10" oninput="update()"><span class="val" id="mpc-v">10 min</span></div>
         <div class="row"><label>Admin min / payment (Spense)</label><input type="range" id="mps" min="1" max="10" step="1" value="3" oninput="update()"><span class="val" id="mps-v">3 min</span></div>
@@ -491,14 +518,14 @@ const SYMS={EUR:'€',NOK:'kr',DKK:'kr',SEK:'kr',CHF:'CHF',GBP:'£'}
 // Native-currency market presets validated 2026-04-29 with Sweden added the same day.
 // SE industry assumptions (ppm, apv, hrc) mirror Denmark pending Claus's review post 2026-05-04.
 const MARKETS={
-  norway:      {currency:'NOK',ppm:350,apv:2706,mpc:10,mps:3,hrc:40,grw:3,loc:5,lic:3500,trm:250,txf:0.2,ifl:5000,obh:3,csLic:1500,csFpc:50,csIfl:5000,smsFee:1.0,urlFee:190},
-  denmark:     {currency:'DKK',ppm:229,apv:640,mpc:10,mps:3,hrc:38,grw:3,loc:5,lic:2500,trm:250,txf:0.05,ifl:5000,obh:3,csLic:990,csFpc:30,csIfl:5000,smsFee:0.5,urlFee:125},
-  sweden:      {currency:'SEK',ppm:229,apv:640,mpc:10,mps:3,hrc:38,grw:3,loc:5,lic:3650,trm:365,txf:0.1,ifl:7300,obh:3,csLic:1450,csFpc:45,csIfl:7300,smsFee:0.75,urlFee:185},
-  benelux:     {currency:'EUR',ppm:350,apv:2700,mpc:10,mps:3,hrc:32,grw:3,loc:5,lic:335,trm:30,txf:0.2,ifl:670,obh:3,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
-  germany:     {currency:'EUR',ppm:340,apv:2800,mpc:10,mps:3,hrc:30,grw:3,loc:5,lic:335,trm:30,txf:0.2,ifl:670,obh:3,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
-  switzerland: {currency:'CHF',ppm:350,apv:2800,mpc:10,mps:3,hrc:55,grw:3,loc:5,lic:310,trm:28,txf:0.2,ifl:625,obh:3,csLic:125,csFpc:4,csIfl:625,smsFee:0.1,urlFee:14},
-  italy:       {currency:'EUR',ppm:300,apv:2400,mpc:10,mps:3,hrc:24,grw:3,loc:5,lic:335,trm:30,txf:0.2,ifl:670,obh:3,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
-  uk:          {currency:'GBP',ppm:350,apv:2500,mpc:10,mps:3,hrc:28,grw:3,loc:5,lic:290,trm:30,txf:0.2,ifl:670,obh:3,csLic:115,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
+  norway:      {currency:'NOK',ppm:350,apv:670,mpc:10,mps:3,hrc:40,grw:3,loc:5,lic:3500,trm:250,txf:0.2,ifl:5000,obh:3,csLic:1500,csFpc:50,csIfl:5000,smsFee:1.0,urlFee:190},
+  denmark:     {currency:'DKK',ppm:229,apv:4500,mpc:10,mps:3,hrc:38,grw:3,loc:5,lic:2500,trm:250,txf:0.05,ifl:5000,obh:3,csLic:990,csFpc:30,csIfl:5000,smsFee:0.5,urlFee:125},
+  sweden:      {currency:'SEK',ppm:229,apv:655,mpc:10,mps:3,hrc:38,grw:3,loc:5,lic:3650,trm:365,txf:0.1,ifl:7300,obh:3,csLic:1450,csFpc:45,csIfl:7300,smsFee:0.75,urlFee:185},
+  benelux:     {currency:'EUR',ppm:350,apv:600,mpc:10,mps:3,hrc:32,grw:3,loc:5,lic:335,trm:30,txf:0.2,ifl:670,obh:3,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
+  germany:     {currency:'EUR',ppm:340,apv:600,mpc:10,mps:3,hrc:30,grw:3,loc:5,lic:335,trm:30,txf:0.2,ifl:670,obh:3,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
+  switzerland: {currency:'CHF',ppm:350,apv:555,mpc:10,mps:3,hrc:55,grw:3,loc:5,lic:310,trm:28,txf:0.2,ifl:625,obh:3,csLic:125,csFpc:4,csIfl:625,smsFee:0.1,urlFee:14},
+  italy:       {currency:'EUR',ppm:300,apv:600,mpc:10,mps:3,hrc:24,grw:3,loc:5,lic:335,trm:30,txf:0.2,ifl:670,obh:3,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
+  uk:          {currency:'GBP',ppm:350,apv:520,mpc:10,mps:3,hrc:28,grw:3,loc:5,lic:290,trm:30,txf:0.2,ifl:670,obh:3,csLic:115,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15},
 }
 
 let currency='EUR', hiddenOn=false, pspOn=false, smsOn=true, urlOn=true, overlapOn=false, riskOn=false, currentView='as', currentMarket=''
@@ -511,7 +538,7 @@ var DEFAULTS={
   view:'as',
   loc:5,grw:3,mpc:10,mps:3,obh:3,hcup:35,psf:0.8,smsPerPayment:1,ovd:2,trmCnt:1,txf:0.2,
   ppm:150,csCpm:70,csMpc:10,csMps:1,csRiy:2,
-  hrc:40,apv:2706,lic:335,trm:30,ifl:670,ovt:150,ovp:100,
+  hrc:40,apv:600,lic:335,trm:30,ifl:670,ovt:150,ovp:100,
   csAcv:250000,csLic:135,csFpc:4,csIfl:670,smsFee:0.1,urlFee:15
 }
 // @@DEFAULTS_END@@
@@ -520,6 +547,8 @@ function v(id){return parseFloat(document.getElementById(id).value)||0}
 function sv(id,val){var e=document.getElementById(id);if(e)e.value=val}
 function el(id){return document.getElementById(id)}
 function safe(n){return isFinite(n)&&!isNaN(n)?n:0}
+function clamp(n,min,max){return Math.min(max,Math.max(min,n))}
+function roundToStep(n,step){return Math.round(n/step)*step}
 function fmt(val,compact=false){
   val=Math.round(val)
   const sym=SYMS[currency]
@@ -527,6 +556,60 @@ function fmt(val,compact=false){
   return sym+val.toLocaleString()
 }
 function fmtM(m){return(!isFinite(m)||m<=0)?'—':m<1?'< 1 mo':Math.round(m)+' mo'}
+
+const PPM_MIN=50
+const PPM_DENSE_MAX=600
+const PPM_MAX=1000
+const PPM_STEP=5
+const PPM_SLIDER_MAX=1000
+const PPM_DENSE_PORTION=0.8
+const PPM_DENSE_POS_MAX=PPM_SLIDER_MAX*PPM_DENSE_PORTION
+function clampPpmValue(value){
+  return clamp(Math.round(value),PPM_MIN,PPM_MAX)
+}
+function snapPpmValue(value){
+  return clamp(roundToStep(value,PPM_STEP),PPM_MIN,PPM_MAX)
+}
+function ppmValueFromSliderPos(pos){
+  pos=clamp(pos,0,PPM_SLIDER_MAX)
+  if(pos<=PPM_DENSE_POS_MAX){
+    return snapPpmValue(PPM_MIN+((pos/PPM_DENSE_POS_MAX)*(PPM_DENSE_MAX-PPM_MIN)))
+  }
+  return snapPpmValue(PPM_DENSE_MAX+(((pos-PPM_DENSE_POS_MAX)/(PPM_SLIDER_MAX-PPM_DENSE_POS_MAX))*(PPM_MAX-PPM_DENSE_MAX)))
+}
+function ppmSliderPosFromValue(value){
+  value=clampPpmValue(value)
+  if(value<=PPM_DENSE_MAX){
+    return Math.round(((value-PPM_MIN)/(PPM_DENSE_MAX-PPM_MIN))*PPM_DENSE_POS_MAX)
+  }
+  return Math.round(PPM_DENSE_POS_MAX+(((value-PPM_DENSE_MAX)/(PPM_MAX-PPM_DENSE_MAX))*(PPM_SLIDER_MAX-PPM_DENSE_POS_MAX)))
+}
+function setPpmValue(value,snap){
+  sv('ppm',snap?snapPpmValue(value):clampPpmValue(value))
+}
+function syncPpmControls(){
+  var ppm=clampPpmValue(v('ppm'))
+  sv('ppm',ppm)
+  sv('ppm-slider',ppmSliderPosFromValue(ppm))
+  sv('ppm-n',ppm)
+}
+function onPpmSliderInput(){
+  setPpmValue(ppmValueFromSliderPos(v('ppm-slider')))
+  update()
+}
+function onPpmNumberChange(){
+  setPpmValue(v('ppm-n'))
+  update()
+}
+function onPpmNumberKeydown(event){
+  if(event.key==='ArrowUp'){event.preventDefault();stepPpm(5)}
+  else if(event.key==='ArrowDown'){event.preventDefault();stepPpm(-5)}
+  else if(event.key==='Enter'){onPpmNumberChange()}
+}
+function stepPpm(delta){
+  setPpmValue(snapPpmValue(v('ppm'))+delta,true)
+  update()
+}
 
 function calcAS(){
   const ppm=v('ppm'),apv=v('apv-n'),loc=v('loc'),hrc=v('hrc-n'),grw=v('grw')/100
@@ -758,9 +841,10 @@ function clearAllDirty(){}
 function updateLabels(){
   const sym=SYMS[currency]
   document.querySelectorAll('.curr-sym').forEach(e=>e.textContent=sym)
+  syncPpmControls()
   el('loc-v').textContent=Math.round(v('loc'))
   el('grw-v').textContent=v('grw')+'%'
-  el('ppm-v').textContent=Math.round(v('ppm')).toLocaleString()
+  el('ppm-v').textContent=Math.round(v('ppm')).toLocaleString()+'/mo'
   el('mpc-v').textContent=v('mpc')+' min'
   el('mps-v').textContent=v('mps')+' min'
   el('hcup-v').textContent='+'+v('hcup')+'%'
@@ -801,7 +885,7 @@ function applyMarket(key,btn){
   document.querySelectorAll('.market-btn').forEach(b=>b.classList.remove('active'))
   if(btn)btn.classList.add('active')
   currency=m.currency
-  sv('ppm',m.ppm); sv('mpc',m.mpc); sv('mps',m.mps)
+  setPpmValue(m.ppm); sv('mpc',m.mpc); sv('mps',m.mps)
   sv('grw',m.grw); sv('loc',m.loc)
   sv('hrc-n',   m.hrc)
   sv('apv-n',   m.apv)
@@ -837,7 +921,7 @@ function applyScenario(minutes,btn){
   var eld=function(id){return document.getElementById(id)}
 
   svd('loc',d.loc); svd('grw',d.grw)
-  svd('ppm',d.ppm); svd('mpc',d.mpc); svd('mps',d.mps)
+  setPpmValue(d.ppm); svd('mpc',d.mpc); svd('mps',d.mps)
   svd('txf-n',d.txf); svd('obh-n',d.obh)
   svd('hcup',d.hcup); svd('psf',d.psf); svd('sms-per-payment-n',d.smsPerPayment)
   svd('ovd',d.ovd); svd('trm-cnt',d.trmCnt)
