@@ -73,52 +73,38 @@ Both flows write the URL to the contact's `spense_calculator_url` property in Hu
 
 ## 3. Architecture at a glance
 
-Four Cloudflare Workers + one R2 bucket + one KV namespace + one GitHub Pages site.
+Four Cloudflare Workers, one R2 bucket, one KV namespace, one GitHub Pages site. All share a single Cloudflare account.
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│                    Sales Rep using calculator                       │
-│              (browser → GitHub Pages frontend)                      │
-│                                                                     │
-│  index.html (mortenspense.github.io/spense-calculator/)             │
-└────────────────────────────┬───────────────────────────────────────┘
-                             │ POST /publish (Bearer token)
-                             ▼
-┌────────────────────────────────────────────────────────────────────┐
-│           publish worker (spense-publish.results-calc...)           │
-│           Validates, writes HTML to R2, returns prospect URL        │
-└────────────────────────────┬───────────────────────────────────────┘
-                             │ Write
-                             ▼
-       ┌─────────────────────────────────────────────────┐
-       │   R2 bucket: spense-calculator                  │
-       │   ├─ slugs/{slug}.html      (rep-published)     │
-       │   ├─ leadgen/{slug}.html    (lead-gen, planned) │
-       │   ├─ visits/{slug}.json     (visit log)         │
-       │   ├─ logs/{ts}-{action}-...  (audit log)        │
-       │   └─ config/reps.json       (sales reps)        │
-       └─────────────────────────────────────────────────┘
-                             ▲
-                             │ Read
-┌────────────────────────────┴───────────────────────────────────────┐
-│           tracker worker (spense-roi.results-calc...)               │
-│           Serves prospect pages, logs visits, fires Slack           │
-└────────────────────────────────────────────────────────────────────┘
+### The components
 
-┌────────────────────────────────────────────────────────────────────┐
-│          dashboard worker (spense-dashboard.results-calc...)        │
-│          Internal UI: prospects, visit history, rep management      │
-│          Uses KV namespace for session tokens                       │
-└────────────────────────────────────────────────────────────────────┘
+| Component | Type | Role |
+|---|---|---|
+| Calculator frontend | Static HTML on GitHub Pages | The tool sales reps use to configure prospect-specific ROI cases |
+| `publish` worker | Cloudflare Worker | Receives publish requests from the frontend, writes prospect HTML to R2, returns the prospect URL |
+| `tracker` worker | Cloudflare Worker | Serves prospect URLs to the public, records visits, fires Slack notifications on visits #1 and #2 |
+| `dashboard` worker | Cloudflare Worker | Internal management UI — list/delete prospects, manage reps, view visit history and audit log |
+| `hubspot` worker | Cloudflare Worker (**unfinished**) | Will handle the self-serve lead-gen flow. Code skeleton only; not deployed. |
+| R2 bucket (`spense-calculator`) | Cloudflare R2 object storage | Single source of truth for all prospect HTML, visit logs, audit log, and rep config |
+| KV namespace | Cloudflare KV | Dashboard session tokens and brute-force lockout state |
 
-┌────────────────────────────────────────────────────────────────────┐
-│         hubspot worker (spense-hubspot.results-calc...)             │
-│         ** NOT YET DEPLOYED — CODE IS A SKELETON **                 │
-│         Will receive lead-gen form submissions,                     │
-│         generate personalised result pages,                         │
-│         write URLs back to HubSpot contacts                         │
-└────────────────────────────────────────────────────────────────────┘
-```
+### The rep-published flow (live today)
+
+1. **Rep** opens the calculator at the GitHub Pages URL and configures inputs for their prospect.
+2. **Rep** clicks "Publish for prospect" — the frontend POSTs the configured HTML to the `publish` worker with a bearer token.
+3. **`publish` worker** validates the request, writes the HTML to R2 at `slugs/{slug}.html`, and returns the prospect URL.
+4. **Rep** sends that URL to the prospect via email or LinkedIn.
+5. **Prospect** opens the URL — the `tracker` worker reads the HTML from R2, serves it, and increments the visit count.
+6. **`tracker` worker** fires a Slack notification on the first two visits.
+7. **Internal team** monitors all prospects, visit counts, and the audit log via the `dashboard` worker.
+
+### The lead-gen flow (planned — full detail in section 7)
+
+1. **Marketing prospect** lands on the HubSpot landing page and submits the form.
+2. **HubSpot** creates a contact with the form values.
+3. **JavaScript snippet on the page** captures the submission and POSTs the values to the `hubspot` worker.
+4. **`hubspot` worker** computes savings, renders a personalised result page, writes it to R2 at `leadgen/{slug}.html`, and writes the URL back to the contact via HubSpot API.
+5. **Browser** redirects the prospect to their result URL (also served by the `tracker` worker, under the `/lg/{slug}` path).
+6. **HubSpot** sends the standard form follow-up email with the URL embedded.
 
 ### Key technical facts
 
