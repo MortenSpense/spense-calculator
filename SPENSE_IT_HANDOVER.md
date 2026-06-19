@@ -582,6 +582,32 @@ Everything else (visit tracking, Slack on visits #1 and #2, audit log) works the
 
 For an engineer comfortable with TypeScript and Cloudflare Workers: **4–6 hours** end-to-end including tests and a deploy. Helpers are already tested, so the new code is mostly orchestration plus the Turnstile and HubSpot API calls.
 
+### If you're using AI assistance to finish this
+
+The remaining code work is well-suited to AI-assisted completion. The original developer built the project with AI assistance throughout; the codebase is structured for it.
+
+**Recommended tooling:**
+
+- **Claude Code** (CLI, what the original developer used). Free to install; point it at the repo with `claude-code` and it can read, edit, run tests, and walk you through deploys.
+- **Cursor** (IDE, paid subscription). Same Claude model under the hood, with a VS Code-style interface.
+- Either works. Pick whichever your team is already comfortable with.
+
+**How to brief the AI:**
+
+1. Open the repo in your AI tool of choice.
+2. Tell it: *"Read `SPENSE_IT_HANDOVER.md` and `CLAUDE.md`, then finish the `spense-hubspot` worker per the spec in section 7. The helpers (`compute.ts`, `slug.ts`, `template.ts`, `markets.ts`) are already built and tested — wire them into the handler. Add the hourly catch-up cron. Run the test suite when you're done."*
+3. Review what it produces. Run the tests. Deploy when satisfied.
+
+**Realistic expectations:**
+
+- AI writes the code reliably; a human still owns Cloudflare credentials, `wrangler deploy`, and the end-to-end smoke test with Helion.
+- You need someone who can read TypeScript at a comprehension level, spot AI hallucinations (e.g., a method called on `R2Bucket` that doesn't exist), and paste test failures back into the chat. Roughly: junior backend developer or above.
+- Total elapsed time with AI assistance: typically 2–4 hours, mostly waiting on Helion + manual testing.
+
+**About the `.Clairvoyance/` folder in the repo root:**
+
+It's a folder of markdown files — design history, project decisions, working notes — produced by the AI tooling the original developer used. Nothing in it is load-bearing for production. Read it for context if useful, or ignore it. Every operationally-relevant fact has been promoted into this handover document.
+
 ---
 
 ## 8. Day-to-day operations
